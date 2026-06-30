@@ -65,13 +65,13 @@
   --radius: 0.5rem;
 
   /* Dressingwala palette */
-  --linen: oklch(0.974 0.008 80);        /* #FAF7F2 background */
-  --healing: oklch(0.43 0.05 165);       /* #2F5D50 deep teal-green */
+  --linen: oklch(0.974 0.008 80); /* #FAF7F2 background */
+  --healing: oklch(0.43 0.05 165); /* #2F5D50 deep teal-green */
   --healing-soft: oklch(0.55 0.045 165);
-  --gauze: oklch(0.89 0.02 70);          /* #E8DDD0 soft beige */
-  --terracotta: oklch(0.63 0.16 35);     /* #D9694F CTA */
+  --gauze: oklch(0.89 0.02 70); /* #E8DDD0 soft beige */
+  --terracotta: oklch(0.63 0.16 35); /* #D9694F CTA */
   --terracotta-deep: oklch(0.56 0.16 35);
-  --charcoal: oklch(0.25 0.015 165);     /* #1F2A24 text */
+  --charcoal: oklch(0.25 0.015 165); /* #1F2A24 text */
 
   --background: var(--linen);
   --foreground: var(--charcoal);
@@ -164,7 +164,10 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     font-weight: 500;
     letter-spacing: -0.01em;

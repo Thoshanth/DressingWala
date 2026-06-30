@@ -18,11 +18,11 @@ On-demand minor wound dressing service. Users request a doctor/nurse home visit 
 
 **Short answer: yes, but not on day one, and not as the primary booking channel.**
 
-| Stage | Need |
-|---|---|
-| Validation (first 2-3 weeks) | WhatsApp number + a single link-in-bio style page is enough to test real demand. No need to over-build before knowing people will actually book. |
-| Early growth | A real lightweight website becomes necessary — for a medical service, trust matters more than for most on-demand categories. A stranger letting a doctor into their home wants to see credentials, service areas, and legitimacy first. WhatsApp alone reads as informal for healthcare. |
-| Scale | Website also becomes your SEO/discovery surface — people searching "dressing doctor near me" need somewhere to land; WhatsApp isn't searchable. |
+| Stage                        | Need                                                                                                                                                                                                                                                                                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Validation (first 2-3 weeks) | WhatsApp number + a single link-in-bio style page is enough to test real demand. No need to over-build before knowing people will actually book.                                                                                                                                         |
+| Early growth                 | A real lightweight website becomes necessary — for a medical service, trust matters more than for most on-demand categories. A stranger letting a doctor into their home wants to see credentials, service areas, and legitimacy first. WhatsApp alone reads as informal for healthcare. |
+| Scale                        | Website also becomes your SEO/discovery surface — people searching "dressing doctor near me" need somewhere to land; WhatsApp isn't searchable.                                                                                                                                          |
 
 **Conclusion**: build a small trust-and-discovery website that funnels everything into WhatsApp. The website is not where bookings happen — it's where people get convinced to message you.
 
@@ -32,16 +32,16 @@ On-demand minor wound dressing service. Users request a doctor/nurse home visit 
 
 A website with no traffic source is just a digital brochure. Since you already own the domain (3-year registration in hand), it's worth using that time horizon for compounding SEO rather than just a launch asset.
 
-| Channel | How it drives traffic |
-|---|---|
-| **Google Business Profile** | List Dressingwala as a home healthcare service with service areas — shows up in "near me" searches and Maps, free and high-intent |
-| **Local SEO (domain-based)** | Since the domain is locked in for 3 years, invest early in location-specific pages/content (e.g., "wound dressing at home in [area], Hyderabad") — SEO compounds over time, so starting now pays off later |
-| **QR codes** | Printed on flyers, pharmacy counters, clinic partnerships — scan straight to the WhatsApp deep-link, skipping the website entirely for low-friction conversion |
-| **Pharmacy/clinic partnerships** | Local pharmacies and small clinics are natural referral points — leave-behind cards with the WhatsApp number/QR |
-| **Instagram/social (geo-tagged)** | Short-form content building trust (doctor intros, "how it works" reels) tagged to service areas |
-| **WhatsApp Business catalog + click-to-chat ads** | Meta ads that open directly into a WhatsApp conversation — highest-intent channel since it skips the website and lands straight in your booking flow |
-| **Referral program** | Simple discount-for-referral once you have repeat customers (diabetic ulcer patients, post-surgical care are naturally recurring) |
-| **Google Ads** | Worth testing once you have unit economics — bid on intent keywords like "dressing at home [city]" |
+| Channel                                           | How it drives traffic                                                                                                                                                                                      |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Google Business Profile**                       | List Dressingwala as a home healthcare service with service areas — shows up in "near me" searches and Maps, free and high-intent                                                                          |
+| **Local SEO (domain-based)**                      | Since the domain is locked in for 3 years, invest early in location-specific pages/content (e.g., "wound dressing at home in [area], Hyderabad") — SEO compounds over time, so starting now pays off later |
+| **QR codes**                                      | Printed on flyers, pharmacy counters, clinic partnerships — scan straight to the WhatsApp deep-link, skipping the website entirely for low-friction conversion                                             |
+| **Pharmacy/clinic partnerships**                  | Local pharmacies and small clinics are natural referral points — leave-behind cards with the WhatsApp number/QR                                                                                            |
+| **Instagram/social (geo-tagged)**                 | Short-form content building trust (doctor intros, "how it works" reels) tagged to service areas                                                                                                            |
+| **WhatsApp Business catalog + click-to-chat ads** | Meta ads that open directly into a WhatsApp conversation — highest-intent channel since it skips the website and lands straight in your booking flow                                                       |
+| **Referral program**                              | Simple discount-for-referral once you have repeat customers (diabetic ulcer patients, post-surgical care are naturally recurring)                                                                          |
+| **Google Ads**                                    | Worth testing once you have unit economics — bid on intent keywords like "dressing at home [city]"                                                                                                         |
 
 **Priority for launch**: Google Business Profile + WhatsApp click-to-chat ads + QR codes at partner pharmacies. These are fast, cheap, and high-intent. SEO content and Instagram are slower-burn and worth starting in parallel since the domain is already secured long-term.
 
@@ -49,9 +49,7 @@ A website with no traffic source is just a digital brochure. Since you already o
 
 ## 4. Legal & Compliance Checklist (lock down before taking paying customers)
 
-- [ ] **Decide the care model**: doctors only, registered nurses only, or both. Affects legal framing, recruiting, and pricing.
-      - Nurses: registered with Indian Nursing Council / state nursing council.
-      - Doctors: registered with the respective State Medical Council.
+- [ ] **Decide the care model**: doctors only, registered nurses only, or both. Affects legal framing, recruiting, and pricing. - Nurses: registered with Indian Nursing Council / state nursing council. - Doctors: registered with the respective State Medical Council.
 - [ ] **Business structure**: operate as an aggregator/marketplace (doctors are independent, you dispatch to them) rather than a clinical establishment — lighter-weight to start.
 - [ ] **Clinical Establishments (Registration and Regulation) Act, 2010** — check applicability state-by-state; relevant mainly if you run a fixed physical premise rather than a pure dispatch model.
 - [ ] **Professional indemnity insurance** for doctors/nurses on the platform.
@@ -96,7 +94,7 @@ Post-visit: review request + log
    - Location (pin or pincode)
    - Preferred time window
 3. Automation filters the doctor roster by service type + area + availability.
-4. Job offer sent to the matched doctor: *"New booking — [area], [time], [type] — Accept / Decline."*
+4. Job offer sent to the matched doctor: _"New booking — [area], [time], [type] — Accept / Decline."_
 5. No response within a timeout (5–10 min) → auto-reassign to next available doctor.
 6. On accept → customer gets doctor name, ETA, payment link.
 7. Status updates: "Doctor en route" → "Visit completed" → review request.
@@ -110,19 +108,21 @@ Post-visit: review request + log
 
 ### Pages (keep to 5–6 max)
 
-| Page | Purpose |
-|---|---|
-| Home | Hero with value prop + WhatsApp CTA, 3-step how-it-works, trust signals |
-| Services | Dressing types covered + starting price |
-| How It Works | Visual flow: Message → Doctor Assigned → Visit → Pay |
-| Our Doctors | Photos/credentials of doctor pool — the single biggest trust-builder for a new healthcare brand |
-| Service Areas | Pincodes/localities currently covered, to set expectations upfront |
-| Contact / Sticky WhatsApp CTA | On every page — this is the real conversion point, not a form |
+| Page                          | Purpose                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| Home                          | Hero with value prop + WhatsApp CTA, 3-step how-it-works, trust signals                         |
+| Services                      | Dressing types covered + starting price                                                         |
+| How It Works                  | Visual flow: Message → Doctor Assigned → Visit → Pay                                            |
+| Our Doctors                   | Photos/credentials of doctor pool — the single biggest trust-builder for a new healthcare brand |
+| Service Areas                 | Pincodes/localities currently covered, to set expectations upfront                              |
+| Contact / Sticky WhatsApp CTA | On every page — this is the real conversion point, not a form                                   |
 
 ### Design direction
+
 Clean, clinical-but-warm: white/soft-blue palette, real doctor photos where possible, clear iconography per dressing type. Reference points: Urban Company, Practo.
 
 ### Build approach
+
 - Static site, no custom backend — WhatsApp deep-link (`wa.me/<number>?text=...`) handles all dynamic logic.
 - Lightweight enough to ship in days once content (doctor credentials, service area list) is ready.
 - Basic analytics (e.g., GA4) to track WhatsApp click-through from the site.
@@ -131,37 +131,41 @@ Clean, clinical-but-warm: white/soft-blue palette, real doctor photos where poss
 
 ## 9. MVP Tech Stack
 
-| Piece | Tool |
-|---|---|
-| WhatsApp automation | Meta Cloud API + automation workflow (n8n) |
-| Doctor/booking database | Spreadsheet (MVP) → proper database later |
-| Website | Static site, fast-build tool, free-tier hosting |
-| Payments | Payment links via WhatsApp (Razorpay/UPI) |
-| Dispatch logic | Workflow filtering by pincode + service type + availability |
-| Doctor-side app | WhatsApp only at MVP — native app only once doctor count justifies it (15–20+) |
-| Analytics | GA4 / dashboard tool |
+| Piece                   | Tool                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------ |
+| WhatsApp automation     | Meta Cloud API + automation workflow (n8n)                                     |
+| Doctor/booking database | Spreadsheet (MVP) → proper database later                                      |
+| Website                 | Static site, fast-build tool, free-tier hosting                                |
+| Payments                | Payment links via WhatsApp (Razorpay/UPI)                                      |
+| Dispatch logic          | Workflow filtering by pincode + service type + availability                    |
+| Doctor-side app         | WhatsApp only at MVP — native app only once doctor count justifies it (15–20+) |
+| Analytics               | GA4 / dashboard tool                                                           |
 
 ---
 
 ## 10. Build Roadmap
 
 ### Phase 0 — Validation (1 week, no website yet)
+
 - WhatsApp number live, manual booking handling.
 - Single link-in-bio page or nothing at all.
 - Goal: confirm real people will book before building anything further.
 
 ### Phase 1 — Manual-Assisted MVP (2–3 weeks)
+
 - WhatsApp bot collects requests.
 - Ops manually assigns doctor from the roster.
 - Lightweight trust website goes live with WhatsApp CTA wired in.
 
 ### Phase 2 — Automated Dispatch (3–4 weeks)
+
 - Auto-match doctor by area + availability.
 - Auto-send job offers with accept/decline.
 - Timeout-and-reassign logic.
 - Payment automation post-acceptance.
 
 ### Phase 3 — Scale Layer
+
 - Doctor performance tracking (completion rate, ratings).
 - Tiered pricing by complexity.
 - Recurring-care subscriptions.

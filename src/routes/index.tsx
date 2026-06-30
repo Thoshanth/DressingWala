@@ -96,12 +96,36 @@ function CTAButton({
 }
 
 const services = [
-  { name: "Wound Dressing", desc: "Clean dressing changes for fresh or chronic wounds.", price: "₹499" },
-  { name: "Post-Surgical Care", desc: "Sterile dressing and monitoring after a procedure.", price: "₹699" },
-  { name: "Diabetic Ulcer Care", desc: "Specialist care for diabetic foot ulcers and pressure sores.", price: "₹799" },
-  { name: "Burn Dressing", desc: "Gentle dressing for minor and moderate burn injuries.", price: "₹699" },
-  { name: "Stitch Removal", desc: "Safe suture removal at the right time, in the comfort of home.", price: "₹399" },
-  { name: "Other Minor Care", desc: "Injections, catheter care, IV line monitoring and more.", price: "₹449" },
+  {
+    name: "Wound Dressing",
+    desc: "Clean dressing changes for fresh or chronic wounds.",
+    price: "₹499",
+  },
+  {
+    name: "Post-Surgical Care",
+    desc: "Sterile dressing and monitoring after a procedure.",
+    price: "₹699",
+  },
+  {
+    name: "Diabetic Ulcer Care",
+    desc: "Specialist care for diabetic foot ulcers and pressure sores.",
+    price: "₹799",
+  },
+  {
+    name: "Burn Dressing",
+    desc: "Gentle dressing for minor and moderate burn injuries.",
+    price: "₹699",
+  },
+  {
+    name: "Stitch Removal",
+    desc: "Safe suture removal at the right time, in the comfort of home.",
+    price: "₹399",
+  },
+  {
+    name: "Other Minor Care",
+    desc: "Injections, catheter care, IV line monitoring and more.",
+    price: "₹449",
+  },
 ];
 
 const doctors = [
@@ -109,14 +133,28 @@ const doctors = [
   { img: doc2, name: "Dr. Rohan Mehta", cred: "MBBS, MS · 12 yrs", tag: "Post-Surgical" },
   { img: doc3, name: "Sister Priya Nair", cred: "Registered Nurse · 6 yrs", tag: "Diabetic Ulcer" },
   { img: doc4, name: "Arjun Kumar, RN", cred: "Registered Nurse · 5 yrs", tag: "Burn Dressing" },
-  { img: doc5, name: "Dr. Lakshmi Iyer", cred: "MBBS, Diabetology · 18 yrs", tag: "Chronic Wounds" },
+  {
+    img: doc5,
+    name: "Dr. Lakshmi Iyer",
+    cred: "MBBS, Diabetology · 18 yrs",
+    tag: "Chronic Wounds",
+  },
   { img: doc6, name: "Vikas Sharma, RN", cred: "Registered Nurse · 4 yrs", tag: "Stitch Removal" },
 ];
 
 const areas = [
-  "Banjara Hills", "Jubilee Hills", "Gachibowli", "Madhapur",
-  "Hitech City", "Kondapur", "Kukatpally", "Begumpet",
-  "Somajiguda", "Ameerpet", "Manikonda", "Financial District",
+  "Banjara Hills",
+  "Jubilee Hills",
+  "Gachibowli",
+  "Madhapur",
+  "Hitech City",
+  "Kondapur",
+  "Kukatpally",
+  "Begumpet",
+  "Somajiguda",
+  "Ameerpet",
+  "Manikonda",
+  "Financial District",
 ];
 
 function Index() {
@@ -134,7 +172,9 @@ function Index() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
           <a href="#top" className="flex items-baseline gap-2">
             <span className="font-display text-xl text-[#2F5D50] md:text-2xl">Dressingwala</span>
-            <span className="hidden font-mono-ui text-[10px] uppercase tracking-widest text-[#2F5D50]/60 sm:inline">HYD</span>
+            <span className="hidden font-mono-ui text-[10px] uppercase tracking-widest text-[#2F5D50]/60 sm:inline">
+              HYD
+            </span>
           </a>
           <nav className="hidden items-center gap-7 text-sm text-[#1F2A24]/75 md:flex">
             {nav.map((n) => (
@@ -143,7 +183,9 @@ function Index() {
               </a>
             ))}
           </nav>
-          <CTAButton size="sm" className="hidden md:inline-flex">Book on WhatsApp</CTAButton>
+          <CTAButton size="sm" className="hidden md:inline-flex">
+            Book on WhatsApp
+          </CTAButton>
         </div>
       </header>
 
@@ -154,7 +196,8 @@ function Index() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#2F5D50]" /> Now serving Hyderabad
             </div>
             <h1 className="font-display text-4xl leading-[1.08] text-[#1F2A24] sm:text-5xl md:text-[64px] md:leading-[1.05]">
-              A doctor at your door,<br className="hidden sm:inline" />{" "}
+              A doctor at your door,
+              <br className="hidden sm:inline" />{" "}
               <span className="italic text-[#2F5D50]">not a queue</span> at the clinic.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#1F2A24]/75">
@@ -163,7 +206,10 @@ function Index() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <CTAButton size="lg" />
-              <a href="#how" className="text-sm text-[#1F2A24]/70 underline-offset-4 hover:text-[#2F5D50] hover:underline">
+              <a
+                href="#how"
+                className="text-sm text-[#1F2A24]/70 underline-offset-4 hover:text-[#2F5D50] hover:underline"
+              >
                 How it works →
               </a>
             </div>
@@ -183,7 +229,9 @@ function Index() {
               />
             </div>
             <div className="absolute -bottom-5 -left-5 hidden rounded-2xl border border-[#E8DDD0] bg-[#FAF7F2] px-4 py-3 shadow-lg sm:block">
-              <div className="font-mono-ui text-[10px] uppercase tracking-widest text-[#2F5D50]/70">Avg. response</div>
+              <div className="font-mono-ui text-[10px] uppercase tracking-widest text-[#2F5D50]/70">
+                Avg. response
+              </div>
               <div className="font-display text-2xl text-[#2F5D50]">32 min</div>
             </div>
           </div>
@@ -194,17 +242,31 @@ function Index() {
 
       <section id="how" className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="max-w-2xl">
-          <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">How it works</p>
+          <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">
+            How it works
+          </p>
           <h2 className="mt-3 font-display text-3xl text-[#1F2A24] md:text-4xl">
             Four steps. No forms, no calls.
           </h2>
         </div>
         <ol className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[
-            { t: "Message us on WhatsApp", d: "Tell us what you need in a sentence — a photo helps." },
-            { t: "Get matched with a nearby pro", d: "A verified doctor or nurse in your area takes the case." },
-            { t: "They visit your home", d: "Usually within 30–45 minutes, with sterile supplies." },
-            { t: "Pay after the visit", d: "Cash, UPI or card. You only pay once you're cared for." },
+            {
+              t: "Message us on WhatsApp",
+              d: "Tell us what you need in a sentence — a photo helps.",
+            },
+            {
+              t: "Get matched with a nearby pro",
+              d: "A verified doctor or nurse in your area takes the case.",
+            },
+            {
+              t: "They visit your home",
+              d: "Usually within 30–45 minutes, with sterile supplies.",
+            },
+            {
+              t: "Pay after the visit",
+              d: "Cash, UPI or card. You only pay once you're cared for.",
+            },
           ].map((s, i) => (
             <li key={s.t} className="relative rounded-2xl border border-[#E8DDD0] bg-[#FAF7F2] p-6">
               <div className="font-mono-ui text-xs tracking-widest text-[#D9694F]">
@@ -222,18 +284,24 @@ function Index() {
       <section id="services" className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">Services</p>
+            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">
+              Services
+            </p>
             <h2 className="mt-3 font-display text-3xl text-[#1F2A24] md:text-4xl">
               Careful, clinical home care.
             </h2>
           </div>
           <p className="max-w-sm text-sm text-[#1F2A24]/65">
-            Prices are starting points. We'll confirm the cost on WhatsApp after we understand your case.
+            Prices are starting points. We'll confirm the cost on WhatsApp after we understand your
+            case.
           </p>
         </div>
         <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-[#E8DDD0] bg-[#E8DDD0] sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s) => (
-            <div key={s.name} className="group bg-[#FAF7F2] p-7 transition-colors hover:bg-[#FAF7F2]/60">
+            <div
+              key={s.name}
+              className="group bg-[#FAF7F2] p-7 transition-colors hover:bg-[#FAF7F2]/60"
+            >
               <div className="flex items-baseline justify-between gap-4">
                 <h3 className="font-display text-xl text-[#1F2A24]">{s.name}</h3>
                 <span className="whitespace-nowrap font-mono-ui text-xs text-[#2F5D50]">
@@ -251,12 +319,16 @@ function Index() {
       <section id="doctors" className="bg-[#E8DDD0]/40 py-20 md:py-28">
         <div className="mx-auto max-w-6xl px-5 md:px-8">
           <div className="max-w-2xl">
-            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">Our doctors & nurses</p>
+            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">
+              Our doctors & nurses
+            </p>
             <h2 className="mt-3 font-display text-3xl text-[#1F2A24] md:text-5xl">
               Real people. Verified credentials. Coming to your home.
             </h2>
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-[#1F2A24]/70">
-              Every clinician on Dressingwala is registered with their respective council, background-checked, and trained in home dressing protocols. You'll know who's coming before they arrive.
+              Every clinician on Dressingwala is registered with their respective council,
+              background-checked, and trained in home dressing protocols. You'll know who's coming
+              before they arrive.
             </p>
           </div>
 
@@ -294,12 +366,15 @@ function Index() {
       <section id="areas" className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">Service areas</p>
+            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#2F5D50]/70">
+              Service areas
+            </p>
             <h2 className="mt-3 font-display text-3xl text-[#1F2A24] md:text-4xl">
               Currently serving across Hyderabad.
             </h2>
             <p className="mt-5 text-[15px] leading-relaxed text-[#1F2A24]/70">
-              We're expanding every week. Don't see your area? Message us anyway — chances are we can still help, or we'll tell you when we'll reach you.
+              We're expanding every week. Don't see your area? Message us anyway — chances are we
+              can still help, or we'll tell you when we'll reach you.
             </p>
           </div>
           <div className="md:col-span-7">
@@ -325,7 +400,9 @@ function Index() {
       <section id="trust" className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="rounded-3xl bg-[#2F5D50] px-6 py-14 text-[#FAF7F2] md:px-14 md:py-20">
           <div className="max-w-2xl">
-            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#FAF7F2]/60">Is this safe?</p>
+            <p className="font-mono-ui text-xs uppercase tracking-widest text-[#FAF7F2]/60">
+              Is this safe?
+            </p>
             <h2 className="mt-3 font-display text-3xl text-[#FAF7F2] md:text-4xl">
               The short answer: yes — and here's why.
             </h2>
@@ -370,27 +447,59 @@ function Index() {
               </div>
             </div>
             <div className="md:col-span-3">
-              <div className="font-mono-ui text-[11px] uppercase tracking-widest text-[#2F5D50]/70">Contact</div>
+              <div className="font-mono-ui text-[11px] uppercase tracking-widest text-[#2F5D50]/70">
+                Contact
+              </div>
               <ul className="mt-4 space-y-2 text-sm text-[#1F2A24]/75">
-                <li>WhatsApp: <span className="font-mono-ui">+91 00000 00000</span></li>
+                <li>
+                  WhatsApp: <span className="font-mono-ui">+91 00000 00000</span>
+                </li>
                 <li>care@dressingwala.in</li>
                 <li>Hyderabad, Telangana</li>
               </ul>
             </div>
             <div className="md:col-span-2">
-              <div className="font-mono-ui text-[11px] uppercase tracking-widest text-[#2F5D50]/70">Sections</div>
+              <div className="font-mono-ui text-[11px] uppercase tracking-widest text-[#2F5D50]/70">
+                Sections
+              </div>
               <ul className="mt-4 space-y-2 text-sm">
-                <li><a href="#how" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">How it works</a></li>
-                <li><a href="#services" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">Services</a></li>
-                <li><a href="#doctors" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">Our doctors</a></li>
-                <li><a href="#areas" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">Areas</a></li>
+                <li>
+                  <a href="#how" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">
+                    How it works
+                  </a>
+                </li>
+                <li>
+                  <a href="#services" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">
+                    Services
+                  </a>
+                </li>
+                <li>
+                  <a href="#doctors" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">
+                    Our doctors
+                  </a>
+                </li>
+                <li>
+                  <a href="#areas" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">
+                    Areas
+                  </a>
+                </li>
               </ul>
             </div>
             <div className="md:col-span-2">
-              <div className="font-mono-ui text-[11px] uppercase tracking-widest text-[#2F5D50]/70">Legal</div>
+              <div className="font-mono-ui text-[11px] uppercase tracking-widest text-[#2F5D50]/70">
+                Legal
+              </div>
               <ul className="mt-4 space-y-2 text-sm">
-                <li><a href="#" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">Terms</a></li>
-                <li><a href="#" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">Privacy</a></li>
+                <li>
+                  <a href="#" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">
+                    Terms
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-[#1F2A24]/75 hover:text-[#2F5D50]">
+                    Privacy
+                  </a>
+                </li>
               </ul>
             </div>
           </div>

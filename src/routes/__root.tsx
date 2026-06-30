@@ -74,10 +74,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Dressingwala — Home wound dressing in Hyderabad" },
-      { name: "description", content: "Book a verified doctor or nurse for wound dressing at home in Hyderabad — usually within 30–45 minutes. Booking happens entirely on WhatsApp." },
+      {
+        name: "description",
+        content:
+          "Book a verified doctor or nurse for wound dressing at home in Hyderabad — usually within 30–45 minutes. Booking happens entirely on WhatsApp.",
+      },
       { name: "author", content: "Dressingwala" },
       { property: "og:title", content: "Dressingwala — Home wound dressing in Hyderabad" },
-      { property: "og:description", content: "A doctor at your door, not a queue at the clinic. Verified home wound care across Hyderabad." },
+      {
+        property: "og:description",
+        content:
+          "A doctor at your door, not a queue at the clinic. Verified home wound care across Hyderabad.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
