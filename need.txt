@@ -1,0 +1,26 @@
+Here is the list of images needed for the project, based on the current layout and code:
+
+Required Images (Currently imported in the code)
+
+1. Logo Image
+   Path: src/assets/logo.png
+   Usage: Used in the Navbar, Footer, and AI Assistant component.
+   Type: Transparent PNG recommended.
+
+2. Hero Image
+   Path: src/assets/hero-nurse.jpg
+   Usage: Used in the main hero section of the landing page as a background or showcase image.
+   Type: High-quality JPG/WebP (e.g., a photo of a nurse or a clinical setting).
+
+Suggested/Optional Images (To enhance the UI)
+
+3. Clinician Profiles (Avatars)
+   Usage: For the "Clinicians" section to show faces next to names like "Sr. Anitha R." and "Sr. Rakesh K."
+   Type: Square or circular profile photos.
+
+4. Testimonial Avatars
+   Usage: For the "Testimonials" section to show photos of the patients/clients.
+   Type: Small circular avatars.
+
+5. Service Images/Thumbnails
+   Usage: The services section currently uses icons (Bandage, Stethoscope, etc.), but you might want to replace them with real images of the procedures (Wound Dressing, IV care, etc.) in the future.
