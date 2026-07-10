@@ -1,0 +1,490 @@
+{
+  "name": "02 Booking and Dispatch",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "2a-trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "phone",
+              "value": "={{ $json.name ? $json.name.split('/').pop() : $json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2a-extract-phone",
+      "name": "Extract Phone",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        150,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Extract Phone').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {}
+      },
+      "id": "2b-get-profile",
+      "name": "Get Customer Profile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        300,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=17.4375,78.4482&destinations=' + $json.fields.lat.doubleValue + ',' + $json.fields.lng.doubleValue + '&key=' + $env.GOOGLE_MAPS_API_KEY }}",
+        "options": {}
+      },
+      "id": "2c-distance-matrix",
+      "name": "Google Distance Matrix",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const serviceStr = ($('Get Customer Profile').item.json.fields?.current_service?.stringValue || '1').toLowerCase();\nlet base_price = 500;\nif (serviceStr.includes('2') || serviceStr.includes('injection')) base_price = 300;\nelse if (serviceStr.includes('3') || serviceStr.includes('catheter')) base_price = 800;\nelse if (serviceStr.includes('4') || serviceStr.includes('nurse')) base_price = 1500;\nelse if (serviceStr.includes('5') || serviceStr.includes('physio')) base_price = 750;\n\nconst distance_m = $json.rows?.[0]?.elements?.[0]?.distance?.value || 0;\nconst distance_km = distance_m / 1000;\nconst rate_per_km = 15;\nconst travel_charge = Math.round(distance_km * rate_per_km);\nconst total = base_price + travel_charge;\n\nreturn { base_price, travel_charge, total, distance_km };"
+      },
+      "id": "2d-calculate-price",
+      "name": "Calculate Price",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Extract Phone').item.json.phone }}",
+        "message": "={{ 'Consultation: ₹' + $json.base_price + '\\nTravel: ₹' + $json.travel_charge + '\\n-----------------\\nTotal: ₹' + $json.total + '\\n\\nReply CASH for Cash, or ONLINE for Payment Link.' }}",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "2e-ask-payment",
+      "name": "Ask Payment Method",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        900,
+        0
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-payment-reply",
+        "options": {}
+      },
+      "id": "2f-wait-payment",
+      "name": "Wait for Payment Reply",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.body.Body.trim().toUpperCase() }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "CASH",
+              "output": 0
+            },
+            {
+              "value2": "ONLINE",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "2g-switch-payment",
+      "name": "Switch Payment",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.razorpay.com/v1/payment_links",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Basic ' + Buffer.from($env.RAZORPAY_KEY_ID + ':' + $env.RAZORPAY_KEY_SECRET).toString('base64') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $('Calculate Price').item.json.total * 100 }}"
+            },
+            {
+              "name": "currency",
+              "value": "INR"
+            },
+            {
+              "name": "description",
+              "value": "Dressing Wala Booking"
+            },
+            {
+              "name": "customer[contact]",
+              "value": "={{ $('Extract Phone').item.json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2h-razorpay",
+      "name": "Razorpay Link",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/doctors?parent=projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents&structuredQuery=' + encodeURIComponent(JSON.stringify({\"where\": {\"compositeFilter\": {\"op\": \"AND\", \"filters\": [{\"fieldFilter\": {\"field\": {\"fieldPath\": \"availability\"}, \"op\": \"EQUAL\", \"value\": {\"stringValue\": \"Available\"}}}]}}})) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {}
+      },
+      "id": "2i-get-doctors",
+      "name": "Get Doctors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1700,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "2j-loop-doctors",
+      "name": "Loop Doctors",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $json.document.fields.phone.stringValue }}",
+        "message": "New Booking!\nReply 1 to Accept, 2 to Decline.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "2k-offer-doctor",
+      "name": "Offer to Doctor",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        0
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "id": "2l-wait-doctor",
+      "name": "Wait (60s)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.body.Body.trim() }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "1",
+              "output": 0
+            },
+            {
+              "value2": "2",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "2m-doctor-reply",
+      "name": "Switch Doctor Reply",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        2500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/bookings/' + encodeURIComponent($('Extract Phone').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"doctor_assigned\": { \"stringValue\": $('Loop Doctors').item.json.document.fields.phone.stringValue }, \"status\": { \"stringValue\": 'DOCTOR ASSIGNED' } } } }}"
+      },
+      "id": "2n-assign-doctor",
+      "name": "Assign Doctor in DB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2700,
+        -100
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Phone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Phone": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Profile": {
+      "main": [
+        [
+          {
+            "node": "Google Distance Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Distance Matrix": {
+      "main": [
+        [
+          {
+            "node": "Calculate Price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Price": {
+      "main": [
+        [
+          {
+            "node": "Ask Payment Method",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Payment Method": {
+      "main": [
+        [
+          {
+            "node": "Wait for Payment Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Payment Reply": {
+      "main": [
+        [
+          {
+            "node": "Switch Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Payment": {
+      "main": [
+        [
+          {
+            "node": "Get Doctors",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Razorpay Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Razorpay Link": {
+      "main": [
+        [
+          {
+            "node": "Get Doctors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doctors": {
+      "main": [
+        [
+          {
+            "node": "Loop Doctors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Doctors": {
+      "main": [
+        [
+          {
+            "node": "Offer to Doctor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Offer to Doctor": {
+      "main": [
+        [
+          {
+            "node": "Wait (60s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (60s)": {
+      "main": [
+        [
+          {
+            "node": "Switch Doctor Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Doctor Reply": {
+      "main": [
+        [
+          {
+            "node": "Assign Doctor in DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Doctors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

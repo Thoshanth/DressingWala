@@ -1,0 +1,685 @@
+{
+  "name": "01 Customer Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-incoming",
+        "options": {}
+      },
+      "id": "1a-webhook",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "phone",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.body.Body.trim() }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "lat",
+              "value": "={{ $json.body.Latitude || null }}"
+            },
+            {
+              "name": "lng",
+              "value": "={{ $json.body.Longitude || null }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1b-normalize",
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "1c-get-customer",
+      "name": "Get Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "onboarding_step",
+              "value": "={{ $json.error ? 'NEW' : ($json.fields?.onboarding_step?.stringValue || 'DONE') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d-extract-state",
+      "name": "Extract State",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        600,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.onboarding_step }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "NEW",
+              "output": 0
+            },
+            {
+              "value2": "ASK_NAME",
+              "output": 1
+            },
+            {
+              "value2": "ASK_SERVICE",
+              "output": 2
+            },
+            {
+              "value2": "ASK_LOCATION",
+              "output": 3
+            },
+            {
+              "value2": "DONE",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "1e-switch-state-1",
+      "name": "Switch State 1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        800,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.onboarding_step }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "ASK_LOCATION",
+              "output": 0
+            },
+            {
+              "value2": "DONE",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "1e-switch-state-2",
+      "name": "Switch State 2",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"phone\": { \"stringValue\": $('Normalize Payload').item.json.phone }, \"onboarding_step\": { \"stringValue\": 'ASK_NAME' } } } }}"
+      },
+      "id": "1f-create-new",
+      "name": "Create NEW Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        -200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Welcome to Dressing Wala! What is your full name?",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "1g-twilio-name",
+      "name": "Ask Name",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -200
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"name\": { \"stringValue\": $('Normalize Payload').item.json.message }, \"onboarding_step\": { \"stringValue\": 'ASK_SERVICE' } } } }}"
+      },
+      "id": "1h-save-name",
+      "name": "Save Name",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Select Service:\n1. Dressing\n2. Injection\n3. Catheter\n4. Home Nurse\n5. Physiotherapy",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "1i-twilio-service",
+      "name": "Ask Service",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        0
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"current_service\": { \"stringValue\": $('Normalize Payload').item.json.message } } } }}"
+      },
+      "id": "1j-save-service",
+      "name": "Save Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ !!$('Get Customer').item.json.fields?.lat?.doubleValue }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "1k-if-location",
+      "name": "Has Location?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'ASK_LOCATION' } } } }}"
+      },
+      "id": "1l-state-ask-loc",
+      "name": "State ASK_LOCATION",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        100
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Got it! Please share your live WhatsApp location pin 📍 so we can calculate travel distance.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "1m-twilio-location",
+      "name": "Ask Location",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        100
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'DONE' } } } }}"
+      },
+      "id": "1n-state-done",
+      "name": "State DONE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "02_Booking_and_Dispatch"
+      },
+      "id": "1o-exec-existing",
+      "name": "Call Booking (Existing)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + $('Normalize Payload').item.json.lat + ',' + $('Normalize Payload').item.json.lng + '&key=' + $env.GOOGLE_MAPS_API_KEY }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "1p-google-geocode",
+      "name": "Google Geocoding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"lat\": { \"doubleValue\": $('Normalize Payload').item.json.lat }, \"lng\": { \"doubleValue\": $('Normalize Payload').item.json.lng }, \"formatted_address\": { \"stringValue\": $json.results && $json.results[0] ? $json.results[0].formatted_address : 'Unknown Address' }, \"onboarding_step\": { \"stringValue\": 'DONE' } } } }}"
+      },
+      "id": "1q-save-location",
+      "name": "Save Location",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        400
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "02_Booking_and_Dispatch"
+      },
+      "id": "1r-exec-new",
+      "name": "Call Booking (New User)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'ASK_SERVICE' } } } }}"
+      },
+      "id": "1s-reset-state",
+      "name": "Reset State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        600
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Payload": {
+      "main": [
+        [
+          {
+            "node": "Get Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer": {
+      "main": [
+        [
+          {
+            "node": "Extract State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract State": {
+      "main": [
+        [
+          {
+            "node": "Switch State 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch State 1": {
+      "main": [
+        [
+          {
+            "node": "Create NEW Customer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Service",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch State 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch State 2": {
+      "main": [
+        [
+          {
+            "node": "Google Geocoding",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reset State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create NEW Customer": {
+      "main": [
+        [
+          {
+            "node": "Ask Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Name": {
+      "main": [
+        [
+          {
+            "node": "Ask Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Service": {
+      "main": [
+        [
+          {
+            "node": "Has Location?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Location?": {
+      "main": [
+        [
+          {
+            "node": "State DONE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "State ASK_LOCATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State DONE": {
+      "main": [
+        [
+          {
+            "node": "Call Booking (Existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State ASK_LOCATION": {
+      "main": [
+        [
+          {
+            "node": "Ask Location",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Geocoding": {
+      "main": [
+        [
+          {
+            "node": "Save Location",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Location": {
+      "main": [
+        [
+          {
+            "node": "Call Booking (New User)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reset State": {
+      "main": [
+        [
+          {
+            "node": "Ask Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

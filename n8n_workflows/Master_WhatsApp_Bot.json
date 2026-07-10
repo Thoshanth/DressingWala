@@ -1,0 +1,1398 @@
+{
+  "name": "DressingWala Master WhatsApp Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-incoming",
+        "options": {}
+      },
+      "id": "1-webhook",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "phone",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.body.Body.trim() }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "lat",
+              "value": "={{ $json.body.Latitude || null }}"
+            },
+            {
+              "name": "lng",
+              "value": "={{ $json.body.Longitude || null }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2-normalize",
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        200,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/doctors/' + encodeURIComponent($json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "3-check-doctor",
+      "name": "Check Doctor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        500
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ !!$json.fields }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "4-is-doctor",
+      "name": "Is Doctor?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $('Normalize Payload').item.json.message }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "1",
+              "output": 0
+            },
+            {
+              "value2": "2",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "D1-doctor-reply",
+      "name": "Switch Doctor Reply",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents:runQuery' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"structuredQuery\": { \"from\": [{\"collectionId\": \"bookings\"}], \"where\": { \"compositeFilter\": { \"op\": \"AND\", \"filters\": [ { \"fieldFilter\": { \"field\": {\"fieldPath\": \"doctor_assigned\"}, \"op\": \"EQUAL\", \"value\": {\"stringValue\": $('Normalize Payload').item.json.phone} } }, { \"fieldFilter\": { \"field\": {\"fieldPath\": \"status\"}, \"op\": \"EQUAL\", \"value\": {\"stringValue\": \"WAITING_DOCTOR\"} } } ] } }, \"limit\": 1 } } }}",
+        "options": {}
+      },
+      "id": "D2-find-booking",
+      "name": "Find Booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        -100
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.length > 0 && $json[0].document }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "D3-has-booking",
+      "name": "Has Booking?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json[0].document.name }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": Object.assign({}, $json[0].document.fields, { \"status\": { \"stringValue\": \"CONFIRMED\" } }) } }}"
+      },
+      "id": "D4-confirm-booking",
+      "name": "Confirm Booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        -200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Find Booking').item.json[0].document.fields.customer_phone.stringValue }}",
+        "message": "Your doctor has been assigned and is on the way!",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "D5-notify-customer",
+      "name": "Notify Customer",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -300
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Booking confirmed! Proceed to the customer location.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "D6-notify-doctor",
+      "name": "Notify Doctor",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -100
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "C1-get-customer",
+      "name": "Get Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        800,
+        800
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "onboarding_step",
+              "value": "={{ $json.error ? 'NEW' : ($json.fields?.onboarding_step?.stringValue || 'DONE') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "C2-extract-state",
+      "name": "Extract State",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.onboarding_step }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "NEW",
+              "output": 0
+            },
+            {
+              "value2": "ASK_NAME",
+              "output": 1
+            },
+            {
+              "value2": "ASK_SERVICE",
+              "output": 2
+            },
+            {
+              "value2": "ASK_LOCATION",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "C3-switch-1",
+      "name": "Switch State 1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.onboarding_step }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "DONE",
+              "output": 0
+            },
+            {
+              "value2": "ASK_PAYMENT",
+              "output": 1
+            },
+            {
+              "value2": "WAIT_DOCTOR",
+              "output": 2
+            }
+          ]
+        }
+      },
+      "id": "C4-switch-2",
+      "name": "Switch State 2",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"phone\": { \"stringValue\": $('Normalize Payload').item.json.phone }, \"onboarding_step\": { \"stringValue\": 'ASK_NAME' } } } }}"
+      },
+      "id": "C-NEW-1",
+      "name": "Create NEW Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Welcome to Dressing Wala! What is your full name?",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "C-NEW-2",
+      "name": "Ask Name",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        200
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"name\": { \"stringValue\": $('Normalize Payload').item.json.message }, \"onboarding_step\": { \"stringValue\": 'ASK_SERVICE' } } } }}"
+      },
+      "id": "C-ASKNAME-1",
+      "name": "Save Name",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        400
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Select Service:\n1. Dressing\n2. Injection\n3. Catheter\n4. Home Nurse\n5. Physiotherapy",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "C-ASKNAME-2",
+      "name": "Ask Service",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        400
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'ASK_SERVICE' } } } }}"
+      },
+      "id": "C-DONE-1",
+      "name": "Reset State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        600
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"current_service\": { \"stringValue\": $('Normalize Payload').item.json.message } } } }}"
+      },
+      "id": "C-ASKSERV-1",
+      "name": "Save Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        800
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ !!$('Get Customer').item.json.fields?.lat?.doubleValue }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "C-ASKSERV-2",
+      "name": "Has Location?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'ASK_LOCATION' } } } }}"
+      },
+      "id": "C-ASKSERV-3F",
+      "name": "State ASK_LOCATION",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1900,
+        700
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Got it! Please share your live WhatsApp location pin 📍 so we can calculate travel distance.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "C-ASKSERV-4F",
+      "name": "Ask Location",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        700
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + $('Normalize Payload').item.json.lat + ',' + $('Normalize Payload').item.json.lng + '&key=' + $env.GOOGLE_MAPS_API_KEY }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "C-ASKLOC-1",
+      "name": "Google Geocoding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"lat\": { \"doubleValue\": $('Normalize Payload').item.json.lat }, \"lng\": { \"doubleValue\": $('Normalize Payload').item.json.lng }, \"formatted_address\": { \"stringValue\": $json.results && $json.results[0] ? $json.results[0].formatted_address : 'Unknown Address' } } } }}"
+      },
+      "id": "C-ASKLOC-2",
+      "name": "Save Location",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1700,
+        1000
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "lat",
+              "value": "={{ $('Normalize Payload').item.json.lat || $('Get Customer').item.json.fields.lat.doubleValue }}"
+            },
+            {
+              "name": "lng",
+              "value": "={{ $('Normalize Payload').item.json.lng || $('Get Customer').item.json.fields.lng.doubleValue }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "service",
+              "value": "={{ $('Get Customer').item.json.fields?.current_service?.stringValue || $('Normalize Payload').item.json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "P-1",
+      "name": "Pricing Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=17.4375,78.4482&destinations=' + $json.lat + ',' + $json.lng + '&key=' + $env.GOOGLE_MAPS_API_KEY }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "P-2",
+      "name": "Distance Matrix",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2200,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const serviceStr = ($('Pricing Data').item.json.service || '1').toLowerCase();\nlet base_price = 500;\nif (serviceStr.includes('2') || serviceStr.includes('injection')) base_price = 300;\nelse if (serviceStr.includes('3') || serviceStr.includes('catheter')) base_price = 800;\nelse if (serviceStr.includes('4') || serviceStr.includes('nurse')) base_price = 1500;\nelse if (serviceStr.includes('5') || serviceStr.includes('physio')) base_price = 750;\n\nconst distance_m = $json.rows?.[0]?.elements?.[0]?.distance?.value || 0;\nconst distance_km = distance_m / 1000;\nconst rate_per_km = 15;\nconst travel_charge = Math.round(distance_km * rate_per_km);\nconst total = base_price + travel_charge;\n\nreturn { base_price, travel_charge, total, distance_km };"
+      },
+      "id": "P-3",
+      "name": "Calculate Price",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'ASK_PAYMENT' } } } }}"
+      },
+      "id": "P-4",
+      "name": "State ASK_PAYMENT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2600,
+        900
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "={{ 'Consultation: ₹' + $json.base_price + '\\nTravel: ₹' + $json.travel_charge + '\\n-----------------\\nTotal: ₹' + $json.total + '\\n\\nReply CASH for Cash, or ONLINE for Payment Link.' }}",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "P-5",
+      "name": "Ask Payment Method",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        900
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $('Normalize Payload').item.json.message.toUpperCase() }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "CASH",
+              "output": 0
+            },
+            {
+              "value2": "ONLINE",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "PAY-1",
+      "name": "Switch Payment",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.razorpay.com/v1/payment_links",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Basic ' + Buffer.from($env.RAZORPAY_KEY_ID + ':' + $env.RAZORPAY_KEY_SECRET).toString('base64') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": 50000
+            },
+            {
+              "name": "currency",
+              "value": "INR"
+            },
+            {
+              "name": "description",
+              "value": "Dressing Wala Booking"
+            },
+            {
+              "name": "customer[contact]",
+              "value": "={{ $('Normalize Payload').item.json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "PAY-2",
+      "name": "Razorpay Link",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1700,
+        1300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "={{ 'Please pay using this link: ' + $json.short_url }}",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "PAY-3",
+      "name": "Send Payment Link",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        1300
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/customers/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"onboarding_step\": { \"stringValue\": 'WAIT_DOCTOR' } } } }}"
+      },
+      "id": "DOC-1",
+      "name": "State WAIT_DOCTOR",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2100,
+        1200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents:runQuery' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"structuredQuery\": { \"from\": [{\"collectionId\": \"doctors\"}], \"where\": { \"fieldFilter\": { \"field\": {\"fieldPath\": \"availability\"}, \"op\": \"EQUAL\", \"value\": {\"stringValue\": \"Available\"} } }, \"limit\": 50 } } }}",
+        "options": {}
+      },
+      "id": "DOC-2",
+      "name": "Get Doctors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2300,
+        1200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/bookings/' + encodeURIComponent($('Normalize Payload').item.json.phone) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"customer_phone\": { \"stringValue\": $('Normalize Payload').item.json.phone }, \"doctor_assigned\": { \"stringValue\": $('Find Closest Doctor').item.json.closest_doctor_phone || '' }, \"status\": { \"stringValue\": 'WAITING_DOCTOR' } } } }}"
+      },
+      "id": "DOC-3",
+      "name": "Create Booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2700,
+        1200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Find Closest Doctor').item.json.closest_doctor_phone }}",
+        "message": "New Booking!\nReply 1 to Accept, 2 to Decline.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "DOC-4",
+      "name": "Offer to Doctor",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        1200
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Thank you! We are currently assigning a doctor. You will receive a confirmation shortly.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "DOC-5",
+      "name": "Notify Customer Waiting",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        1400
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Normalize Payload').item.json.phone }}",
+        "message": "Please hold on, we are still waiting for a doctor to accept your booking!",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "C-WAITDOC-1",
+      "name": "Wait Msg",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        1500
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// 1. Get Customer Coordinates\nlet custLat = 0, custLng = 0;\nconst norm = $('Normalize Payload').item.json;\nconst cust = $('Get Customer').item?.json?.fields;\n\nif (norm.lat && norm.lng) {\n  custLat = parseFloat(norm.lat);\n  custLng = parseFloat(norm.lng);\n} else if (cust && cust.lat && cust.lng) {\n  custLat = parseFloat(cust.lat.doubleValue);\n  custLng = parseFloat(cust.lng.doubleValue);\n}\n\n// 2. Get Available Doctors List\nconst doctors = $('Get Doctors').item.json;\nif (!doctors || doctors.length === 0 || !doctors[0].document) {\n  return [{ json: { error: \"No doctors found\" } }];\n}\n\n// Haversine formula\nfunction getDistanceKm(lat1, lon1, lat2, lon2) {\n  const R = 6371; \n  const dLat = (lat2 - lat1) * Math.PI / 180;\n  const dLon = (lon2 - lon1) * Math.PI / 180; \n  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +\n            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * \n            Math.sin(dLon/2) * Math.sin(dLon/2); \n  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); \n  return R * c;\n}\n\n// 3. Find Closest\nlet closestDoctor = null;\nlet shortestDistance = Infinity;\n\nfor (const doc of doctors) {\n  if (!doc.document) continue;\n  \n  const fields = doc.document.fields;\n  const docLat = fields.lat ? parseFloat(fields.lat.doubleValue || fields.lat.stringValue) : 0;\n  const docLng = fields.lng ? parseFloat(fields.lng.doubleValue || fields.lng.stringValue) : 0;\n  const phone = fields.phone ? fields.phone.stringValue : '';\n  \n  if (docLat !== 0 && docLng !== 0 && custLat !== 0 && custLng !== 0) {\n    const dist = getDistanceKm(custLat, custLng, docLat, docLng);\n    if (dist < shortestDistance) {\n      shortestDistance = dist;\n      closestDoctor = { phone: phone, distance: dist.toFixed(2) };\n    }\n  } else if (!closestDoctor) {\n    // Fallback to first doctor if no coordinates are available\n    closestDoctor = { phone: phone, distance: 0 };\n  }\n}\n\nif (!closestDoctor) {\n  return [{ json: { error: \"No valid doctors found\" } }];\n}\n\nreturn {\n  closest_doctor_phone: closestDoctor.phone,\n  distance_km: closestDoctor.distance\n};\n"
+      },
+      "id": "GEO-1",
+      "name": "Find Closest Doctor",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2500,
+        1200
+      ]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Payload": {
+      "main": [
+        [
+          {
+            "node": "Check Doctor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Doctor": {
+      "main": [
+        [
+          {
+            "node": "Is Doctor?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Doctor?": {
+      "main": [
+        [
+          {
+            "node": "Switch Doctor Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Doctor Reply": {
+      "main": [
+        [
+          {
+            "node": "Find Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Booking": {
+      "main": [
+        [
+          {
+            "node": "Has Booking?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Booking?": {
+      "main": [
+        [
+          {
+            "node": "Confirm Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Booking": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Doctor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer": {
+      "main": [
+        [
+          {
+            "node": "Extract State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract State": {
+      "main": [
+        [
+          {
+            "node": "Switch State 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch State 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch State 1": {
+      "main": [
+        [
+          {
+            "node": "Create NEW Customer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Service",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Geocoding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch State 2": {
+      "main": [
+        [
+          {
+            "node": "Reset State",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Payment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait Msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create NEW Customer": {
+      "main": [
+        [
+          {
+            "node": "Ask Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Name": {
+      "main": [
+        [
+          {
+            "node": "Ask Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reset State": {
+      "main": [
+        [
+          {
+            "node": "Ask Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Service": {
+      "main": [
+        [
+          {
+            "node": "Has Location?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Location?": {
+      "main": [
+        [
+          {
+            "node": "Pricing Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "State ASK_LOCATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State ASK_LOCATION": {
+      "main": [
+        [
+          {
+            "node": "Ask Location",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Geocoding": {
+      "main": [
+        [
+          {
+            "node": "Save Location",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Location": {
+      "main": [
+        [
+          {
+            "node": "Pricing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pricing Data": {
+      "main": [
+        [
+          {
+            "node": "Distance Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Distance Matrix": {
+      "main": [
+        [
+          {
+            "node": "Calculate Price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Price": {
+      "main": [
+        [
+          {
+            "node": "State ASK_PAYMENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State ASK_PAYMENT": {
+      "main": [
+        [
+          {
+            "node": "Ask Payment Method",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Payment": {
+      "main": [
+        [
+          {
+            "node": "State WAIT_DOCTOR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Razorpay Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Razorpay Link": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Payment Link": {
+      "main": [
+        [
+          {
+            "node": "State WAIT_DOCTOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State WAIT_DOCTOR": {
+      "main": [
+        [
+          {
+            "node": "Get Doctors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doctors": {
+      "main": [
+        [
+          {
+            "node": "Find Closest Doctor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Booking": {
+      "main": [
+        [
+          {
+            "node": "Offer to Doctor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Customer Waiting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Closest Doctor": {
+      "main": [
+        [
+          {
+            "node": "Create Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -47,6 +47,16 @@ export function Navbar() {
     { label: "FAQ", href: "/#faq", id: "faq" },
     { label: "Blogs", href: "/blogs", id: "blogs" },
   ];
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (location.pathname === "/") {
+      e.preventDefault();
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
   
   return (
     <header className="fixed top-0 inset-x-0 z-30 backdrop-blur-lg bg-background/80 border-b">
@@ -61,7 +71,7 @@ export function Navbar() {
             return l.href.startsWith("/") && !l.href.includes("#") ? (
               <Link key={l.href} to={l.href} className={`transition ${isActive ? "text-primary font-bold" : "hover:text-foreground"}`}>{l.label}</Link>
             ) : (
-              <a key={l.href} href={l.href} className={`transition ${isActive ? "text-primary font-bold" : "hover:text-foreground"}`}>{l.label}</a>
+              <a key={l.href} href={l.href} onClick={(e) => handleScroll(e, l.id)} className={`transition ${isActive ? "text-primary font-bold" : "hover:text-foreground"}`}>{l.label}</a>
             );
           })}
         </nav>
@@ -102,7 +112,7 @@ export function Navbar() {
               return l.href.startsWith("/") && !l.href.includes("#") ? (
                 <Link key={l.href} to={l.href} onClick={() => setOpen(false)} className={`py-3 border-b last:border-b-0 ${isActive ? "text-primary font-bold" : ""}`}>{l.label}</Link>
               ) : (
-                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className={`py-3 border-b last:border-b-0 ${isActive ? "text-primary font-bold" : ""}`}>{l.label}</a>
+                <a key={l.href} href={l.href} onClick={(e) => { handleScroll(e, l.id); setOpen(false); }} className={`py-3 border-b last:border-b-0 ${isActive ? "text-primary font-bold" : ""}`}>{l.label}</a>
               );
             })}
           </nav>
@@ -113,6 +123,18 @@ export function Navbar() {
 }
 
 export function Footer() {
+  const location = useLocation();
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (location.pathname === "/") {
+      e.preventDefault();
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
   return (
     <footer className="border-t bg-surface mt-20">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 grid md:grid-cols-4 gap-8">
@@ -136,9 +158,9 @@ export function Footer() {
         <div>
           <h4 className="font-semibold text-sm mb-3">Quick links</h4>
           <ul className="text-sm space-y-2 text-muted-foreground">
-            <li><a href="/#services" className="hover:text-foreground">Services</a></li>
-            <li><a href="/#pricing" className="hover:text-foreground">Pricing</a></li>
-            <li><a href="/#areas" className="hover:text-foreground">Areas we serve</a></li>
+            <li><a href="/#services" onClick={(e) => handleScroll(e, "services")} className="hover:text-foreground">Services</a></li>
+            <li><a href="/#pricing" onClick={(e) => handleScroll(e, "pricing")} className="hover:text-foreground">Pricing</a></li>
+            <li><a href="/#areas" onClick={(e) => handleScroll(e, "areas")} className="hover:text-foreground">Areas we serve</a></li>
             <li><Link to="/blogs" className="hover:text-foreground">Blogs</Link></li>
           </ul>
         </div>

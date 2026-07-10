@@ -1,0 +1,299 @@
+{
+  "name": "03 Lifecycle and Feedback",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "doctor-webhook",
+        "options": {}
+      },
+      "id": "3a-webhook",
+      "name": "Doctor Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.body.Body.trim().toUpperCase() }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "START",
+              "output": 0
+            },
+            {
+              "value2": "ARRIVED",
+              "output": 1
+            },
+            {
+              "value2": "BEGIN",
+              "output": 2
+            },
+            {
+              "value2": "DONE",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "3b-switch",
+      "name": "Switch Keyword",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/bookings/' + encodeURIComponent($json.body.From) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"status\": { \"stringValue\": 'DOCTOR STARTED' } } } }}"
+      },
+      "id": "3c-patch-start",
+      "name": "Update START",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        -100
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/bookings/' + encodeURIComponent($json.body.From) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"status\": { \"stringValue\": 'DOCTOR ARRIVED' } } } }}"
+      },
+      "id": "3d-patch-arrived",
+      "name": "Update ARRIVED",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        100
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/bookings/' + encodeURIComponent($json.body.From) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"status\": { \"stringValue\": 'TREATMENT STARTED' } } } }}"
+      },
+      "id": "3e-patch-begin",
+      "name": "Update BEGIN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/bookings/' + encodeURIComponent($json.body.From) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"status\": { \"stringValue\": 'COMPLETED' }, \"completed_at\": { \"timestampValue\": new Date().toISOString() } } } }}"
+      },
+      "id": "3f-patch-done",
+      "name": "Update DONE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        500
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "={{ $('Doctor Webhook').item.json.body.From }}",
+        "message": "Thank you for using Dressing Wala!\nYour service is complete.\n\nPlease rate your experience from 1 to 5.",
+        "from": "={{ (function() { let num = ($env.TWILIO_PHONE_NUMBER || '').replace(/\\s+/g, ''); return num.startsWith('whatsapp:') ? num : 'whatsapp:' + num; })() }}"
+      },
+      "id": "3g-feedback",
+      "name": "Ask Feedback",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        600,
+        500
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio_account",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-feedback-reply",
+        "options": {}
+      },
+      "id": "3h-wait-feedback",
+      "name": "Wait for Rating",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        800,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/' + $env.FIREBASE_PROJECT_ID + '/databases/(default)/documents/ratings/' + encodeURIComponent($json.body.From) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"fields\": { \"rating\": { \"stringValue\": $json.body.Body.trim() }, \"timestamp\": { \"timestampValue\": new Date().toISOString() } } } }}"
+      },
+      "id": "3i-save-rating",
+      "name": "Save Rating",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        500
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "google_api_firestore",
+          "name": "Google API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Doctor Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Keyword": {
+      "main": [
+        [
+          {
+            "node": "Update START",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update ARRIVED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update BEGIN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DONE": {
+      "main": [
+        [
+          {
+            "node": "Ask Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Feedback": {
+      "main": [
+        [
+          {
+            "node": "Wait for Rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Rating": {
+      "main": [
+        [
+          {
+            "node": "Save Rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
