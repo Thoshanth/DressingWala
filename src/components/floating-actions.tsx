@@ -101,12 +101,13 @@ export function FloatingActions() {
             exit={{ y: 80 }}
             className="fixed bottom-0 inset-x-0 z-30 md:hidden p-3 pb-4 bg-card/95 backdrop-blur border-t"
           >
-            <button
-              onClick={() => window.dispatchEvent(new Event("open-booking"))}
+            <a
+              href={waLink("Hi DressingWala, I'd like to book a home dressing.")}
+              target="_blank" rel="noopener noreferrer"
               className="block w-full text-center py-3 rounded-xl bg-gradient-brand text-primary-foreground font-semibold shadow-soft"
             >
               Book Home Dressing
-            </button>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>

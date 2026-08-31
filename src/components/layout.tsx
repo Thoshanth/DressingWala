@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Phone, Calendar, Menu, X, MessageCircle, MapPin, Moon, Sun } from "lucide-react";
+import { Phone, Calendar, Menu, X, MessageCircle, MapPin } from "lucide-react";
 import { openBooking } from "@/components/booking-dialog";
 import { CONTACT, waLink, telLink } from "@/lib/contact";
 import logo from "@/assets/Logo.jpg";
@@ -7,21 +7,8 @@ import { Link, useLocation } from "@tanstack/react-router";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">(
-    () => (typeof window !== "undefined" && window.localStorage.getItem("theme") === "dark") ? "dark" : "light"
-  );
   const [activeSection, setActiveSection] = useState("");
   const location = useLocation();
-
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [theme]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -76,24 +63,18 @@ export function Navbar() {
           })}
         </nav>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-label="Toggle dark mode"
-            className="grid place-items-center w-10 h-10 rounded-xl border hover:border-primary transition text-muted-foreground hover:text-foreground"
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
           <a href={telLink()} aria-label="Call us" className="hidden sm:grid place-items-center w-10 h-10 rounded-xl border hover:border-primary transition">
             <Phone className="w-4 h-4" />
           </a>
-          <button
-            onClick={openBooking}
+          <a
+            href={waLink("Hi DressingWala, I'd like to book a home dressing.")}
+            target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-brand text-primary-foreground text-sm font-semibold shadow-soft hover:shadow-lift transition"
           >
             <Calendar className="w-4 h-4" />
             <span className="hidden sm:inline">Book Home Dressing</span>
             <span className="sm:hidden">Book</span>
-          </button>
+          </a>
           <button
             className="md:hidden grid place-items-center w-10 h-10 rounded-xl border"
             onClick={() => setOpen((v) => !v)}

@@ -4,7 +4,7 @@ import {
   Bandage, Stethoscope, Syringe, HeartPulse, Droplets, Scissors,
   ShieldCheck, Clock, MapPin, Star, Phone, MessageCircle, Calendar,
   CheckCircle2, ChevronDown, AlertTriangle, Upload, Sparkles, UserCheck,
-  BadgeCheck, Users, Home,
+  BadgeCheck, Users, Home, Camera,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,12 +20,11 @@ export const Route = createFileRoute("/")({
 });
 
 const services = [
-  { icon: Bandage, title: "Simple Wound Dressing", desc: "Cuts, abrasions, minor injuries with sterile technique.", price: "₹499" },
-  { icon: Stethoscope, title: "Post-Surgery Dressing", desc: "Post-operative sites, drain checks, sterile care.", price: "₹799" },
-  { icon: HeartPulse, title: "Diabetic Ulcer Care", desc: "Specialized dressings and wound monitoring for diabetics.", price: "₹899" },
-  { icon: Droplets, title: "Complex / Large Wounds", desc: "Advanced dressings for burns, pressure sores, deep wounds.", price: "₹1,199" },
-  { icon: Scissors, title: "Suture / Staple Removal", desc: "Gentle, clean removal after your surgeon's clearance.", price: "₹599" },
-  { icon: Syringe, title: "IV / Injection & Catheter Care", desc: "IM/IV injections, catheter and colostomy care at home.", price: "₹499" },
+  { icon: Bandage, title: "Simple Wound Dressing", desc: "Cuts, abrasions, minor injuries with sterile technique.", price: "₹599" },
+  { icon: Stethoscope, title: "Post Surgery Dressing", desc: "Post-operative sites, drain checks, sterile care.", price: "₹899" },
+  { icon: HeartPulse, title: "Diabetic Foot Wounds", desc: "Specialized dressings and wound monitoring for diabetics.", price: "₹799" },
+  { icon: Droplets, title: "Complex / Large Wounds", desc: "Advanced dressings for burns, deep wounds, trauma and poly trauma open wounds", price: "₹1,499" },
+  { icon: Scissors, title: "Suture / Staple Removal", desc: "Gentle, clean removal after your surgeon's clearance.", price: "₹999" },
 ];
 
 const whyUs = [
@@ -37,9 +36,9 @@ const whyUs = [
 
 const steps = [
   { n: "01", title: "Book in 60 seconds", desc: "Tap Book Home Dressing or message us on WhatsApp." },
-  { n: "02", title: "Share details", desc: "Send location, prescription (if any) and your preferred time." },
-  { n: "03", title: "Nurse assigned", desc: "A verified DressingWala nurse is dispatched to your address." },
-  { n: "04", title: "Care at home", desc: "Sterile dressing done at home. Pay after service, with receipt." },
+  { n: "02", title: "Share details", desc: "Send location, prescription , wound pictures (if any) and your preferred time." },
+  { n: "03", title: "Nurse/Technician assigned", desc: "A verified DressingWala nurse/technician is assigned to your address." },
+  { n: "04", title: "Care at home", desc: "Sterile dressing done at home and receive your invoice." },
 ];
 
 const areas = [
@@ -55,15 +54,6 @@ const clinicians = [
   { name: "Sr. Vinod P.", role: "Critical Care Nurse", exp: "10 yrs", specialty: "Burns & pressure sores" },
 ];
 
-const testimonials = [
-  { name: "Ravi M.", area: "Gachibowli", text: "My father's post-op dressing was handled beautifully. Punctual, sterile, and very kind with him.", rating: 5 },
-  { name: "Priya S.", area: "Kondapur", text: "Diabetic ulcer care at home saved us so many hospital trips. The nurse explained every step.", rating: 5 },
-  { name: "Arjun T.", area: "Madhapur", text: "Booked on WhatsApp at 10am, nurse arrived by noon. Genuinely impressed.", rating: 5 },
-  { name: "Suresh P.", area: "Jubilee Hills", text: "The wound dressing was done precisely. Complete sterile procedure followed.", rating: 5 },
-  { name: "Anita V.", area: "Banjara Hills", text: "Very prompt service and the nurse was exceptionally caring.", rating: 5 },
-  { name: "Kiran R.", area: "Secunderabad", text: "Convenient at-home care with reasonable pricing. Highly recommended.", rating: 5 },
-  { name: "Meena K.", area: "Kukatpally", text: "The healthcare professional was highly skilled and made my mother feel very comfortable.", rating: 5 },
-];
 
 const faqs = [
   { q: "How quickly can a nurse reach me?", a: "In most Hyderabad neighborhoods within 60–120 minutes. Book before 3 PM for same-day service; emergency slots may be available on request." },
@@ -77,9 +67,10 @@ const faqs = [
 const chatFlow = [
   { icon: MessageCircle, title: "Say hi on WhatsApp", desc: "Tap the WhatsApp button — we reply within minutes." },
   { icon: MapPin, title: "Share your location", desc: "Send a live location pin so we can dispatch the nearest nurse." },
-  { icon: Upload, title: "Upload prescription", desc: "Send a photo of your Rx (optional) — helps us prepare materials." },
+  { icon: Upload, title: "Upload documents", desc: "Send photo of your treatment details, documents / prescription." },
+  { icon: Camera, title: "Wound Pictures", desc: "It helps us prepare material and proper Quotation." },
   { icon: Clock, title: "Choose preferred time", desc: "Pick a slot that suits you — today, tomorrow, or later." },
-  { icon: CheckCircle2, title: "Booking confirmed", desc: "You'll get an SMS + WhatsApp confirmation with nurse details." },
+  { icon: CheckCircle2, title: "Booking confirmed", desc: "You'll get an SMS + WhatsApp confirmation with nurse/technician details." },
 ];
 
 function Section({ id, eyebrow, title, subtitle, children }: { id?: string; eyebrow?: string; title: string; subtitle?: string; children: React.ReactNode }) {
@@ -117,16 +108,16 @@ function Hero() {
             <span className="text-gradient-brand">at your doorstep.</span>
           </h1>
           <p className="mt-5 text-base md:text-lg text-muted-foreground max-w-lg md:max-w-none">
-            Verified nurses for wound dressing, post-surgery care, diabetic ulcers, suture removal and more —
-            without the hospital trip.
+            Verified nurses, technicians, and doctors for wound dressing of pre- and post-operative wounds, including complex trauma and non-healing ulcers, diabetic foot wounds, and venous ulcers.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-            <button
-              onClick={openBooking}
+            <a
+              href={waLink("Hi DressingWala, I'd like to book a home dressing.")}
+              target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-brand text-primary-foreground font-semibold shadow-lift hover:scale-[1.02] active:scale-[0.98] transition"
             >
               <Calendar className="w-5 h-5" /> Book Home Dressing
-            </button>
+            </a>
             <a
               href={waLink("Hi DressingWala, I have a question.")}
               target="_blank" rel="noopener noreferrer"
@@ -136,9 +127,7 @@ function Hero() {
             </a>
           </div>
           <div className="mt-8 flex flex-wrap gap-6 justify-center md:justify-start text-sm text-muted-foreground">
-            <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-teal" /> Verified nurses</div>
-            <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-teal" /> 60–120 min ETA</div>
-            <div className="flex items-center gap-2"><Star className="w-4 h-4 text-teal" /> 4.9 · 1,200+ visits</div>
+            <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-teal" /> Verified nurses, technicians and doctors</div>
           </div>
         </motion.div>
 
@@ -192,7 +181,7 @@ function Hero() {
 
 function Services() {
   return (
-    <Section id="services" eyebrow="Services" title="Home care, done right." subtitle="From simple dressings to complex post-operative care — everything you need, at home.">
+    <Section id="services" eyebrow="Services" title="Home care, done right & Comfortable" subtitle="From simple dressings to complex post-operative care — everything you need, at home.">
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {services.map((s, i) => (
           <motion.div
@@ -237,12 +226,13 @@ function Pricing() {
                 <div className="text-xs text-muted-foreground line-clamp-1">{s.desc}</div>
               </div>
               <div className="font-bold text-primary text-lg whitespace-nowrap">{s.price}</div>
-              <button
-                onClick={openBooking}
+              <a
+                href={waLink(`Hi DressingWala, I'd like to book: ${s.title}`)}
+                target="_blank" rel="noopener noreferrer"
                 className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-medium hover:border-primary hover:text-primary transition"
               >
                 Book
-              </button>
+              </a>
             </li>
           ))}
         </ul>
@@ -309,10 +299,10 @@ function How() {
           <div>
             <div className="text-xs font-semibold uppercase tracking-widest text-whatsapp">WhatsApp booking flow</div>
             <h3 className="mt-1 text-2xl md:text-3xl font-bold">Book without downloads or logins.</h3>
-            <p className="mt-2 text-muted-foreground">Our automated WhatsApp assistant guides you through booking in under a minute.</p>
+            <p className="mt-2 text-muted-foreground">Our hassle-free automated WhatsApp assistant guides you through booking in under a minute.</p>
           </div>
         </div>
-        <ol className="mt-8 grid md:grid-cols-5 gap-4">
+        <ol className="mt-8 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {chatFlow.map((f, i) => (
             <li key={f.title} className="relative rounded-2xl border bg-surface p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -326,7 +316,7 @@ function How() {
         </ol>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href={waLink()} target="_blank" rel="noopener noreferrer"
-             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-whatsapp text-white font-semibold shadow-soft hover:scale-[1.02] transition">
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-whatsapp text-white font-semibold shadow-soft hover:scale-[1.02] transition">
             <MessageCircle className="w-4 h-4" /> Start booking on WhatsApp
           </a>
         </div>
@@ -337,7 +327,7 @@ function How() {
 
 function Areas() {
   return (
-    <Section id="areas" eyebrow="Coverage" title="We cover Hyderabad." subtitle="Service across major localities in Hyderabad and Secunderabad. Don't see your area? Message us — we're expanding fast.">
+    <Section id="areas" eyebrow="Coverage" title={"We\u00A0\u00A0\u00A0cover\u00A0\u00A0\u00A0Hyderabad."} subtitle="Service across major localities in Hyderabad and Secunderabad. Don't see your area? Message us — we're expanding fast.">
       <div className="rounded-3xl border bg-card p-6 md:p-8">
         <div className="flex items-center gap-2 mb-6 text-muted-foreground">
           <MapPin className="w-4 h-4 text-teal" />
@@ -350,7 +340,7 @@ function Areas() {
             </span>
           ))}
           <a href={waLink("Do you cover my area? My locality is …")} target="_blank" rel="noopener noreferrer"
-             className="px-4 py-2 rounded-full bg-gradient-brand text-primary-foreground text-sm font-semibold">
+            className="px-4 py-2 rounded-full bg-gradient-brand text-primary-foreground text-sm font-semibold">
             + Check your area
           </a>
         </div>
@@ -368,11 +358,11 @@ function Clinicians() {
         </div>
         <h3 className="text-2xl font-display font-semibold">Strict Background Verification</h3>
         <p className="text-lg text-muted-foreground leading-relaxed">
-          Your safety is our absolute priority. We do not compromise on the quality of care you receive at home. 
-          Every single doctor, nurse, and healthcare professional in our network undergoes a rigorous, 
+          Your safety is our absolute priority. We do not compromise on the quality of care you receive at home.
+          Every single doctor, nurse, and healthcare professional in our network undergoes a rigorous,
           multi-step background verification process before they ever step foot in your home.
         </p>
-        
+
         <div className="grid sm:grid-cols-3 gap-6 pt-8 text-left">
           <div className="p-6 bg-card border rounded-2xl">
             <Users className="w-6 h-6 text-teal mb-3" />
@@ -395,35 +385,6 @@ function Clinicians() {
   );
 }
 
-function Testimonials() {
-  return (
-    <Section id="reviews" eyebrow="Testimonials" title="Loved by patients & families.">
-      <div className="overflow-hidden relative -mx-4 md:-mx-6 px-4 md:px-6 py-4">
-        {/* Fading edges for the marquee */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/12 bg-gradient-to-r from-background to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/12 bg-gradient-to-l from-background to-transparent z-10" />
-        
-        <div className="flex gap-5 w-max animate-marquee hover-pause">
-          {[...testimonials, ...testimonials].map((t, i) => (
-            <motion.blockquote
-              key={`${t.name}-${i}`}
-              className="rounded-3xl p-6 bg-card border hover:shadow-lift transition w-[320px] md:w-[380px] shrink-0 whitespace-normal"
-            >
-              <div className="flex gap-0.5 text-teal mb-3">
-                {Array.from({ length: t.rating }).map((_, k) => <Star key={k} className="w-4 h-4 fill-current" />)}
-              </div>
-              <p className="text-foreground/85 leading-relaxed">"{t.text}"</p>
-              <footer className="mt-4 text-sm">
-                <div className="font-semibold">{t.name}</div>
-                <div className="text-muted-foreground text-xs">{t.area}, Hyderabad</div>
-              </footer>
-            </motion.blockquote>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-}
 
 function Emergency() {
   return (
@@ -436,14 +397,14 @@ function Emergency() {
               <AlertTriangle className="w-3.5 h-3.5" /> Emergency home visit
             </div>
             <h3 className="mt-4 text-2xl md:text-4xl font-bold leading-tight">Need urgent dressing today?</h3>
-            <p className="mt-2 opacity-90 md:text-lg">We keep emergency slots open for post-op bleeds, unplanned wound care and diabetic emergencies.</p>
+            <p className="mt-2 opacity-90 md:text-lg">We keep emergency slots open for post-op bleeds, unplanned wound care emergencies.</p>
           </div>
           <div className="flex flex-col sm:flex-row md:flex-col gap-3 md:min-w-[240px]">
             <a href={telLink()} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-primary font-semibold hover:scale-[1.02] transition">
               <Phone className="w-4 h-4" /> Call {CONTACT.phoneDisplay}
             </a>
             <a href={waLink("URGENT: I need a home dressing visit as soon as possible.")} target="_blank" rel="noopener noreferrer"
-               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/15 border border-white/30 text-white font-semibold hover:bg-white/25 transition">
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/15 border border-white/30 text-white font-semibold hover:bg-white/25 transition">
               <MessageCircle className="w-4 h-4" /> WhatsApp SOS
             </a>
           </div>
@@ -496,7 +457,6 @@ function Home_() {
         <How />
         <Areas />
         <Clinicians />
-        <Testimonials />
         <Emergency />
         <FAQ />
       </main>
