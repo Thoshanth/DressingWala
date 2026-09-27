@@ -23,7 +23,7 @@ const services = [
   { icon: Bandage, title: "Simple Wound Dressing", desc: "Cuts, abrasions, minor injuries with sterile technique.", price: "₹599" },
   { icon: Stethoscope, title: "Post Surgery Dressing", desc: "Post-operative sites, drain checks, sterile care.", price: "₹899" },
   { icon: HeartPulse, title: "Diabetic Foot Wounds", desc: "Specialized dressings and wound monitoring for diabetics.", price: "₹799" },
-  { icon: Droplets, title: "Complex / Large Wounds", desc: "Advanced dressings for burns, deep wounds, trauma and poly trauma open wounds", price: "₹1,499" },
+  { icon: Droplets, title: "Complex / Large Wounds", desc: "Advanced dressings for burns, deep wounds, trauma and poly trauma open wounds", price: "₹1,199" },
   { icon: Scissors, title: "Suture / Staple Removal", desc: "Gentle, clean removal after your surgeon's clearance.", price: "₹999" },
 ];
 
@@ -93,7 +93,7 @@ function Section({ id, eyebrow, title, subtitle, children }: { id?: string; eyeb
 
 function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-28 md:pt-36 pb-16 md:pb-24 px-4 md:px-6 bg-gradient-hero">
+    <section id="top" className="relative overflow-hidden pt-28 md:pt-36 pb-16 md:pb-24 px-4 md:px-6 bg-gradient-hero" aria-label="Hero section - DressingWala home wound care services">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
@@ -104,17 +104,18 @@ function Hero() {
             Serving Hyderabad · Same-day visits
           </span>
           <h1 className="mt-5 text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-            Sterile wound dressing,{" "}
-            <span className="text-gradient-brand">at your doorstep.</span>
+            Professional Sterile Wound Dressing & Nursing Services,{" "}
+            <span className="text-gradient-brand">at your doorstep in Hyderabad.</span>
           </h1>
           <p className="mt-5 text-base md:text-lg text-muted-foreground max-w-lg md:max-w-none">
-            Verified nurses, technicians, and doctors for wound dressing of pre- and post-operative wounds, including complex trauma and non-healing ulcers, diabetic foot wounds, and venous ulcers.
+            <strong>Verified nurses, technicians, and doctors</strong> for wound dressing of pre- and post-operative wounds, including <em>complex trauma</em> and <em>non-healing ulcers</em>, <em>diabetic foot wounds</em>, and <em>venous ulcers</em>. Same-day home visits across Hyderabad including Gachibowli, Madhapur, Hitech City, and more.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <a
               href={waLink("Hi DressingWala, I'd like to book a home dressing.")}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-brand text-primary-foreground font-semibold shadow-lift hover:scale-[1.02] active:scale-[0.98] transition"
+              aria-label="Book home wound dressing service via WhatsApp"
             >
               <Calendar className="w-5 h-5" /> Book Home Dressing
             </a>
@@ -122,8 +123,9 @@ function Hero() {
               href={waLink("Hi DressingWala, I have a question.")}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-whatsapp text-white font-semibold shadow-soft hover:scale-[1.02] active:scale-[0.98] transition"
+              aria-label="Contact DressingWala on WhatsApp"
             >
-              <MessageCircle className="w-5 h-5" /> WhatsApp
+              <MessageCircle className="w-5 h-5" /> WhatsApp Us
             </a>
           </div>
           <div className="mt-8 flex flex-wrap gap-6 justify-center md:justify-start text-sm text-muted-foreground">
@@ -138,8 +140,10 @@ function Hero() {
           <div className="relative rounded-3xl overflow-hidden shadow-lift">
             <img
               src={heroImg}
-              alt="A DressingWala nurse performing a wound dressing at a patient's home"
+              alt="Professional DressingWala registered nurse performing sterile wound dressing at patient's home in Hyderabad"
+              title="Home Wound Dressing Service in Hyderabad by DressingWala"
               width={1600} height={1200}
+              loading="eager"
               className="w-full h-full object-cover aspect-[4/3]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
@@ -181,7 +185,7 @@ function Hero() {
 
 function Services() {
   return (
-    <Section id="services" eyebrow="Services" title="Home care, done right & Comfortable" subtitle="From simple dressings to complex post-operative care — everything you need, at home.">
+    <Section id="services" eyebrow="Services" title="Home care, done right & Comfortable" subtitle="From simple dressings to complex post-operative care — everything you need, at home. All services include sterile equipment, verified healthcare professionals, and transparent pricing.">
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {services.map((s, i) => (
           <motion.div
@@ -189,15 +193,19 @@ function Services() {
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.05 }}
             className="group rounded-3xl border bg-card p-6 hover:shadow-lift hover:-translate-y-1 hover:border-primary/30 transition-all"
+            itemScope itemType="https://schema.org/Service"
           >
             <div className="w-12 h-12 rounded-2xl bg-gradient-brand text-primary-foreground grid place-items-center mb-4 group-hover:scale-110 transition">
               <s.icon className="w-6 h-6" />
             </div>
-            <h3 className="font-display font-bold text-lg">{s.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+            <h3 className="font-display font-bold text-lg" itemProp="name">{s.title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground" itemProp="description">{s.desc}</p>
             <div className="mt-4 flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Starting from</span>
-              <span className="font-bold text-primary text-lg">{s.price}</span>
+              <span className="font-bold text-primary text-lg" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                <meta itemProp="priceCurrency" content="INR" />
+                <span itemProp="price">{s.price}</span>
+              </span>
             </div>
           </motion.div>
         ))}
@@ -327,23 +335,30 @@ function How() {
 
 function Areas() {
   return (
-    <Section id="areas" eyebrow="Coverage" title={"We\u00A0\u00A0\u00A0cover\u00A0\u00A0\u00A0Hyderabad."} subtitle="Service across major localities in Hyderabad and Secunderabad. Don't see your area? Message us — we're expanding fast.">
-      <div className="rounded-3xl border bg-card p-6 md:p-8">
+    <Section id="areas" eyebrow="Coverage" title={"We\u00A0\u00A0\u00A0cover\u00A0\u00A0\u00A0Hyderabad."} subtitle="Professional home wound dressing service across major localities in Hyderabad and Secunderabad. Same-day visits available in Gachibowli, Madhapur, Hitech City, Kondapur, and all major areas. Don't see your area? Message us — we're expanding fast.">
+      <div className="rounded-3xl border bg-card p-6 md:p-8" itemScope itemType="https://schema.org/Service">
         <div className="flex items-center gap-2 mb-6 text-muted-foreground">
           <MapPin className="w-4 h-4 text-teal" />
-          <span className="text-sm">Live coverage — Hyderabad</span>
+          <span className="text-sm">Live coverage — Hyderabad & Secunderabad</span>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {areas.map((a) => (
-            <span key={a} className="px-4 py-2 rounded-full bg-surface border text-sm font-medium hover:border-primary hover:text-primary transition cursor-default">
-              {a}
-            </span>
-          ))}
-          <a href={waLink("Do you cover my area? My locality is …")} target="_blank" rel="noopener noreferrer"
-            className="px-4 py-2 rounded-full bg-gradient-brand text-primary-foreground text-sm font-semibold">
-            + Check your area
-          </a>
-        </div>
+        <nav aria-label="Service coverage areas in Hyderabad">
+          <ul className="flex flex-wrap gap-2" role="list">
+            {areas.map((a) => (
+              <li key={a} itemProp="areaServed" itemScope itemType="https://schema.org/Place">
+                <span itemProp="name" className="px-4 py-2 rounded-full bg-surface border text-sm font-medium hover:border-primary hover:text-primary transition cursor-default inline-block">
+                  {a}
+                </span>
+              </li>
+            ))}
+            <li>
+              <a href={waLink("Do you cover my area? My locality is …")} target="_blank" rel="noopener noreferrer"
+                className="px-4 py-2 rounded-full bg-gradient-brand text-primary-foreground text-sm font-semibold inline-block"
+                aria-label="Check if your area in Hyderabad is covered">
+                + Check your area
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </Section>
   );
