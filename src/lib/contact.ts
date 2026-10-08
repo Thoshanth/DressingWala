@@ -3,7 +3,7 @@ export const CONTACT = {
   phone: "+919966255559",
   phoneDisplay: "+91 99662 55559",
   whatsapp: "919966255559", // international format, no + or spaces
-  email: "care@dressingwala.in",
+  email: "care.admin@dressingwala.com",
   city: "Hyderabad",
 };
 

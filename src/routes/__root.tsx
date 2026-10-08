@@ -68,25 +68,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const TITLE = "DressingWala — Home Wound Dressing & Post-Surgery Care in Hyderabad";
-const DESC =
-  "Verified nurses at your doorstep for wound dressing, post-operative care, diabetic ulcer care, suture removal & more. Book a home visit in minutes.";
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { name: "author", content: "DressingWala" },
       { name: "theme-color", content: "#2563EB" },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: TITLE },
-      { name: "twitter:description", content: DESC },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -101,11 +88,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <>
-      <HeadContent />
-      {children}
-      <Scripts />
-    </>
+    <html lang="en">
+      <head>
+        <HeadContent />
+        {/* TODO: Add Google Tag Manager (GTM-XXXXXXX) here */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7H6YPJ23M"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Z7H6YPJ23M');
+            `,
+          }}
+        />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
   );
 }
 

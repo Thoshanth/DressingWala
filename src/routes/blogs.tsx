@@ -1,54 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Navbar, Footer } from "@/components/layout";
 import { ArrowRight, Clock, User } from "lucide-react";
 import { FloatingActions } from "@/components/floating-actions";
+import { buildHead } from "@/lib/seo";
+import { blogPosts } from "@/lib/blogs";
 
 export const Route = createFileRoute("/blogs")({
   component: BlogsPage,
+  head: () => buildHead({
+    title: "Wound Care Articles & Resources | DressingWala",
+    description: "Expert insights, tips, and guides on wound care, post-surgery recovery, and maintaining health at home.",
+    path: "/blogs",
+  }),
 });
-
-const SAMPLE_BLOGS = [
-  {
-    id: 1,
-    title: "Understanding Diabetic Foot Ulcers: Causes, Symptoms, and Care",
-    excerpt: "Diabetic foot ulcers are a severe complication of diabetes. Learn how proper wound care at home can prevent infections and speed up recovery.",
-    author: "Dr. Sandhya R.",
-    date: "Oct 12, 2023",
-    category: "Diabetic Care",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80"
-  },
-  {
-    id: 2,
-    title: "The Importance of Sterile Technique in Post-Surgery Wound Dressing",
-    excerpt: "Why is a sterile environment crucial for post-operative care? Discover the best practices our nurses follow to ensure you heal safely.",
-    author: "Sr. Anitha R.",
-    date: "Sep 28, 2023",
-    category: "Post-Op Recovery",
-    readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=800&q=80"
-  },
-  {
-    id: 3,
-    title: "Managing Pressure Sores for Bedridden Patients",
-    excerpt: "Bedsores can develop quickly and be painful. Read our comprehensive guide on preventing and treating pressure ulcers at home.",
-    author: "Sr. Rakesh K.",
-    date: "Sep 15, 2023",
-    category: "Elderly Care",
-    readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80"
-  },
-  {
-    id: 4,
-    title: "When to Seek Immediate Medical Attention for a Wound",
-    excerpt: "Not all wounds can be treated at home. Learn the critical warning signs of infection and when you need to rush to the emergency room.",
-    author: "Dr. Vivek M.",
-    date: "Aug 30, 2023",
-    category: "First Aid",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800&q=80"
-  }
-];
 
 function BlogsPage() {
   return (
@@ -65,8 +29,8 @@ function BlogsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {SAMPLE_BLOGS.map((blog) => (
-              <article key={blog.id} className="group rounded-3xl border bg-card overflow-hidden hover:shadow-lift transition flex flex-col">
+            {blogPosts.map((blog) => (
+              <Link to="/blog/$slug" params={{ slug: blog.slug }} key={blog.id} className="group rounded-3xl border bg-card overflow-hidden hover:shadow-lift transition flex flex-col">
                 <div className="h-60 overflow-hidden relative">
                   <div className="absolute top-4 left-4 z-10">
                     <span className="px-3 py-1 text-xs font-semibold bg-white/90 text-teal rounded-full shadow-sm backdrop-blur">
@@ -90,11 +54,11 @@ function BlogsPage() {
                   <p className="text-muted-foreground leading-relaxed mb-6 flex-1">
                     {blog.excerpt}
                   </p>
-                  <button className="flex items-center gap-2 text-sm font-semibold text-teal group-hover:text-teal/80 transition w-fit">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-teal group-hover:text-teal/80 transition w-fit">
                     Read full article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-                  </button>
+                  </span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>

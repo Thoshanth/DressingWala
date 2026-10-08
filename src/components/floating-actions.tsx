@@ -29,85 +29,41 @@ export function FloatingActions() {
         initial={{ scale: 0, rotate: -90 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ delay: 0.3, type: "spring" }}
-        className="fixed bottom-6 right-6 z-40 grid place-items-center w-14 h-14 rounded-full bg-whatsapp text-white shadow-lift hover:scale-110 active:scale-95 transition animate-pulse-ring"
+        className="hidden md:grid fixed bottom-6 right-6 z-40 place-items-center w-14 h-14 rounded-full bg-whatsapp text-white shadow-lift hover:scale-110 active:scale-95 transition animate-pulse-ring"
       >
         <MessageCircle className="w-6 h-6" />
       </motion.a>
 
-      {/* Left stack: AI + call, expandable */}
-      <div className="fixed bottom-6 left-6 z-40 flex flex-col items-start gap-3">
-        <AnimatePresence>
-          {expanded && (
-            <>
-              <motion.a
-                key="tel"
-                href={telLink()}
-                initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                aria-label={`Call ${CONTACT.phoneDisplay}`}
-                className="flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-card border shadow-soft hover:border-primary transition text-sm font-medium"
-              >
-                <span className="grid place-items-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                  <Phone className="w-4 h-4" />
-                </span>
-                Call now
-              </motion.a>
-              <motion.button
-                key="ai"
-                onClick={() => { setChatOpen(true); setExpanded(false); }}
-                initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                transition={{ delay: 0.05 }}
-                aria-label="Open AI assistant"
-                className="flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-card border shadow-soft hover:border-teal transition text-sm font-medium"
-              >
-                <span className="grid place-items-center w-8 h-8 rounded-full bg-teal text-teal-foreground">
-                  <Bot className="w-4 h-4" />
-                </span>
-                Ask AI
-              </motion.button>
-            </>
-          )}
-        </AnimatePresence>
-
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          aria-label={expanded ? "Close quick actions" : "Open quick actions"}
-          aria-expanded={expanded}
-          className="grid place-items-center w-14 h-14 rounded-full bg-gradient-brand text-white shadow-lift hover:scale-110 active:scale-95 transition"
-        >
-          <AnimatePresence mode="wait">
-            {expanded ? (
-              <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                <X className="w-6 h-6" />
-              </motion.span>
-            ) : (
-              <motion.span key="c" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
-                <Calendar className="w-6 h-6" />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
-      </div>
+      {/* Left stack removed per user request */}
 
       {/* Sticky book bar on mobile once scrolled */}
       <AnimatePresence>
         {scrolled && (
           <motion.div
-            initial={{ y: 80 }}
+            initial={{ y: 150 }}
             animate={{ y: 0 }}
-            exit={{ y: 80 }}
-            className="fixed bottom-0 inset-x-0 z-30 md:hidden p-3 pb-4 bg-card/95 backdrop-blur border-t"
+            exit={{ y: 150 }}
+            className="fixed bottom-0 inset-x-0 z-30 md:hidden bg-white border-t border-[#E5EEF0] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-safe"
           >
-            <a
-              href={waLink("Hi DressingWala, I'd like to book a home dressing.")}
-              target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center py-3 rounded-xl bg-gradient-brand text-primary-foreground font-semibold shadow-soft"
-            >
-              Book Home Dressing
-            </a>
+            <div className="p-4 flex flex-col gap-3">
+              <p className="text-center text-sm font-semibold text-[#0B1F44]">Need wound care at home?</p>
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href={waLink("Hi DressingWala, I'd like to book a home dressing.")}
+                  target="_blank" rel="noopener noreferrer"
+                  className="block w-full text-center py-3 rounded-xl bg-[#0B1F44] text-white font-semibold shadow-sm text-sm"
+                >
+                  Book a Home Visit
+                </a>
+                <a
+                  href={waLink()}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-center py-3 rounded-xl bg-[#25D366] text-white font-semibold shadow-sm text-sm"
+                >
+                  <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+                </a>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

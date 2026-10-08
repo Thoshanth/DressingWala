@@ -6,12 +6,10 @@ import { waLink } from "@/lib/contact";
 
 const SERVICES = [
   "Simple Wound Dressing",
-  "Post-Surgery Dressing",
-  "Diabetic Ulcer Care",
-  "Complex / Large Wounds",
+  "Diabetic Foot Wound",
+  "Post Surgery Dressing",
   "Suture / Staple Removal",
-  "IV / Injection & Catheter Care",
-  "Not sure — please advise",
+  "Complex / Large Wounds",
 ];
 
 const TIME_SLOTS = [

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   Bandage, Stethoscope, Syringe, HeartPulse, Droplets, Scissors,
@@ -14,17 +14,32 @@ import { Navbar, Footer } from "@/components/layout";
 import { CONTACT, waLink, telLink } from "@/lib/contact";
 import heroImg from "@/assets/hero-nurse.jpg";
 import logo from "@/assets/Logo.jpg";
+import { buildHead, businessSchema, breadcrumbSchema, faqSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   component: Home_,
+  head: () => buildHead({
+    title: "Home Wound Dressing in Hyderabad | Nurse at Your Door | DressingWala",
+    description: "Professional home wound dressing in Hyderabad with verified nurses. Post-surgery care, diabetic ulcer treatment, burn dressing, suture removal at your doorstep. Same-day visits available. Starting ₹599. Book now!",
+    path: "/",
+    jsonLd: [
+      businessSchema(areas),
+      breadcrumbSchema([
+        { name: "Home", path: "/" },
+        { name: "Services", path: "/#services" },
+        { name: "Coverage Areas", path: "/#areas" }
+      ]),
+      faqSchema(faqs)
+    ]
+  }),
 });
 
 const services = [
-  { icon: Bandage, title: "Simple Wound Dressing", desc: "Cuts, abrasions, minor injuries with sterile technique.", price: "₹599" },
-  { icon: Stethoscope, title: "Post Surgery Dressing", desc: "Post-operative sites, drain checks, sterile care.", price: "₹899" },
-  { icon: HeartPulse, title: "Diabetic Foot Wounds", desc: "Specialized dressings and wound monitoring for diabetics.", price: "₹799" },
-  { icon: Droplets, title: "Complex / Large Wounds", desc: "Advanced dressings for burns, deep wounds, trauma and poly trauma open wounds", price: "₹1,199" },
-  { icon: Scissors, title: "Suture / Staple Removal", desc: "Gentle, clean removal after your surgeon's clearance.", price: "₹999" },
+  { icon: Bandage, title: "Simple Wound Dressing", desc: "Cuts, abrasions, minor injuries with sterile technique.", price: "₹599", link: "/simple-wound-dressing-hyderabad", bg: "#EFFBFA", accent: "#08A6A6" },
+  { icon: HeartPulse, title: "Diabetic Foot Wound", desc: "Specialized dressings and wound monitoring for diabetics.", price: "₹799", link: "/diabetic-foot-wound-hyderabad", bg: "#F3F0FF", accent: "#7567D8" },
+  { icon: Scissors, title: "Post Surgery Dressing", desc: "Post-operative sites, drain checks, sterile care.", price: "₹899", link: "/post-surgery-dressing-hyderabad", bg: "#FFF0EA", accent: "#F0785C" },
+  { icon: Scissors, title: "Suture / Staple Removal", desc: "Gentle, clean removal after your surgeon's clearance.", price: "₹999", link: "/suture-staple-removal-hyderabad", bg: "#FFF7DD", accent: "#D99A22" },
+  { icon: Droplets, title: "Complex / Large Wounds", desc: "Advanced dressings for burns, deep wounds, trauma and poly trauma open wounds.", price: "₹1,199", link: "/complex-large-wounds-hyderabad", bg: "#EAF6FF", accent: "#2787D9" },
 ];
 
 const whyUs = [
@@ -36,8 +51,8 @@ const whyUs = [
 
 const steps = [
   { n: "01", title: "Book in 60 seconds", desc: "Tap Book Home Dressing or message us on WhatsApp." },
-  { n: "02", title: "Share details", desc: "Send location, prescription , wound pictures (if any) and your preferred time." },
-  { n: "03", title: "Nurse/Technician assigned", desc: "A verified DressingWala nurse/technician is assigned to your address." },
+  { n: "02", title: "Share details", desc: "Send location, prescription, wound pictures (if any) and preferred time." },
+  { n: "03", title: "Nurse assigned", desc: "A verified DressingWala nurse/technician is assigned to your address." },
   { n: "04", title: "Care at home", desc: "Sterile dressing done at home and receive your invoice." },
 ];
 
@@ -65,12 +80,12 @@ const faqs = [
 ];
 
 const chatFlow = [
-  { icon: MessageCircle, title: "Say hi on WhatsApp", desc: "Tap the WhatsApp button — we reply within minutes." },
-  { icon: MapPin, title: "Share your location", desc: "Send a live location pin so we can dispatch the nearest nurse." },
-  { icon: Upload, title: "Upload documents", desc: "Send photo of your treatment details, documents / prescription." },
-  { icon: Camera, title: "Wound Pictures", desc: "It helps us prepare material and proper Quotation." },
-  { icon: Clock, title: "Choose preferred time", desc: "Pick a slot that suits you — today, tomorrow, or later." },
-  { icon: CheckCircle2, title: "Booking confirmed", desc: "You'll get an SMS + WhatsApp confirmation with nurse/technician details." },
+  { icon: MessageCircle, title: "Tap the WhatsApp button", desc: "Say hi and we reply within minutes to start.", bg: "#DDF7F5", color: "#08A6A6" },
+  { icon: UserCheck, title: "Share patient details", desc: "Provide basic information for the patient record.", bg: "#EAF6FF", color: "#2787D9" },
+  { icon: Upload, title: "Upload documents", desc: "Send photo of your treatment details or prescription.", bg: "#F3F0FF", color: "#7567D8" },
+  { icon: MapPin, title: "Share your location", desc: "Send a live location pin to dispatch the nearest nurse.", bg: "#FFF0EA", color: "#F0785C" },
+  { icon: Clock, title: "Choose preferred time", desc: "Pick a slot that suits you — today, tomorrow, or later.", bg: "#FFF7DD", color: "#D99A22" },
+  { icon: CheckCircle2, title: "Booking confirmed", desc: "You'll get an SMS + WhatsApp confirmation with nurse details.", bg: "#DDF7F5", color: "#08A6A6" },
 ];
 
 function Section({ id, eyebrow, title, subtitle, children }: { id?: string; eyebrow?: string; title: string; subtitle?: string; children: React.ReactNode }) {
@@ -104,7 +119,7 @@ function Hero() {
             Serving Hyderabad · Same-day visits
           </span>
           <h1 className="mt-5 text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-            Professional Sterile Wound Dressing & Nursing Services,{" "}
+            Professional Wound Dressing & Nursing Services,{" "}
             <span className="text-gradient-brand">at your doorstep in Hyderabad.</span>
           </h1>
           <p className="mt-5 text-base md:text-lg text-muted-foreground max-w-lg md:max-w-none">
@@ -188,26 +203,29 @@ function Services() {
     <Section id="services" eyebrow="Services" title="Home care, done right & Comfortable" subtitle="From simple dressings to complex post-operative care — everything you need, at home. All services include sterile equipment, verified healthcare professionals, and transparent pricing.">
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {services.map((s, i) => (
-          <motion.div
+          <Link
+            to={s.link}
             key={s.title}
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.05 }}
-            className="group rounded-3xl border bg-card p-6 hover:shadow-lift hover:-translate-y-1 hover:border-primary/30 transition-all"
+            className="group rounded-3xl border border-transparent p-6 hover:shadow-lift hover:-translate-y-1 hover:border-black/5 transition-all block"
+            style={{ backgroundColor: s.bg }}
             itemScope itemType="https://schema.org/Service"
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-brand text-primary-foreground grid place-items-center mb-4 group-hover:scale-110 transition">
+            <div 
+              className="w-12 h-12 rounded-2xl grid place-items-center mb-4 group-hover:scale-110 transition shadow-sm"
+              style={{ backgroundColor: s.accent, color: "#fff" }}
+            >
               <s.icon className="w-6 h-6" />
             </div>
-            <h3 className="font-display font-bold text-lg" itemProp="name">{s.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground" itemProp="description">{s.desc}</p>
+            <h3 className="font-display font-bold text-lg" style={{ color: "#0B1F44" }} itemProp="name">{s.title}</h3>
+            <p className="mt-2 text-sm text-[#64748B]" itemProp="description">{s.desc}</p>
             <div className="mt-4 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Starting from</span>
-              <span className="font-bold text-primary text-lg" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+              <span className="text-[#64748B]">Starting from</span>
+              <span className="font-bold text-lg" style={{ color: s.accent }} itemProp="offers" itemScope itemType="https://schema.org/Offer">
                 <meta itemProp="priceCurrency" content="INR" />
                 <span itemProp="price">{s.price}</span>
               </span>
             </div>
-          </motion.div>
+          </Link>
         ))}
       </div>
     </Section>
@@ -282,85 +300,214 @@ function Why() {
 
 function How() {
   return (
-    <Section id="how" eyebrow="How it works" title="Book in minutes. Care within hours.">
-      <div className="grid md:grid-cols-4 gap-5">
-        {steps.map((s, i) => (
-          <motion.div
-            key={s.n}
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-            className="relative rounded-3xl p-6 bg-gradient-soft border"
-          >
-            <div className="text-5xl font-display font-bold text-gradient-brand opacity-90">{s.n}</div>
-            <h3 className="mt-3 font-bold">{s.title}</h3>
-            <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
-          </motion.div>
-        ))}
-      </div>
+    <section id="how" className="py-20 md:py-32 px-4 md:px-6 scroll-mt-20">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-16 md:mb-24">
+          <span className="inline-block text-sm font-semibold tracking-[0.2em] uppercase text-[#08A6A6] mb-4">HOW IT WORKS</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-[#0B1F44] leading-tight">
+            Book in minutes. <br className="hidden md:block" />
+            <span className="text-[#08A6A6]">Care within hours.</span>
+          </h2>
+          <p className="mt-6 text-lg text-[#64748B] leading-relaxed">
+            Get professional wound care at home in just a few simple steps.
+          </p>
+        </div>
 
-      {/* WhatsApp chatbot flow */}
-      <div className="mt-16 rounded-3xl border bg-card p-6 md:p-10 shadow-soft">
-        <div className="grid md:grid-cols-[auto_1fr] gap-4 md:gap-6 items-start">
-          <div className="w-14 h-14 rounded-2xl bg-whatsapp text-white grid place-items-center shrink-0">
-            <MessageCircle className="w-7 h-7" />
-          </div>
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-widest text-whatsapp">WhatsApp booking flow</div>
-            <h3 className="mt-1 text-2xl md:text-3xl font-bold">Book without downloads or logins.</h3>
-            <p className="mt-2 text-muted-foreground">Our hassle-free automated WhatsApp assistant guides you through booking in under a minute.</p>
+        {/* 4 Step Process */}
+        <div className="relative">
+          {/* Dotted connecting line - desktop only */}
+          <div className="hidden md:block absolute top-12 left-[12%] right-[12%] h-[2px] border-t-2 border-dashed border-[#E5EEF0] -z-10"></div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-4 relative z-10">
+            {steps.map((s, i) => (
+              <div key={s.n} className="flex flex-row md:flex-col items-start md:items-center text-left md:text-center group bg-white md:bg-transparent p-6 md:p-0 rounded-2xl md:rounded-none shadow-sm md:shadow-none border md:border-none border-[#E5EEF0]">
+                {/* Number indicator */}
+                <div className="w-16 md:w-24 h-16 md:h-24 shrink-0 rounded-full bg-white border-4 border-[#EFFBFA] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center mb-0 md:mb-8 mr-6 md:mr-0 z-10 group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-2xl md:text-3xl font-bold text-[#0B1F44]">{s.n}</span>
+                </div>
+                
+                {/* Content */}
+                <div>
+                  <h3 className="text-lg font-bold text-[#0B1F44] mb-2">{s.title}</h3>
+                  <p className="text-sm text-[#64748B] leading-relaxed max-w-[250px] mx-auto">{s.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <ol className="mt-8 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {chatFlow.map((f, i) => (
-            <li key={f.title} className="relative rounded-2xl border bg-surface p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold text-teal">STEP {i + 1}</span>
+
+        {/* WhatsApp Booking Section */}
+        <div className="mt-32 rounded-[28px] md:rounded-[40px] bg-[#EFFBFA] overflow-hidden p-8 md:p-16 relative">
+          <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
+            
+            {/* Left: Phone Mockup */}
+            <div className="order-2 md:order-1 relative flex justify-center">
+              <div className="w-[280px] md:w-[320px] h-[580px] bg-white rounded-[48px] shadow-xl border-[8px] border-[#E5EEF0] overflow-hidden relative flex flex-col">
+                {/* Phone Header */}
+                <div className="bg-[#0B1F44] pt-12 pb-4 px-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <img src={logo} alt="DressingWala" className="w-8 h-8 rounded-full object-cover" />
+                  </div>
+                  <div>
+                    <div className="text-white font-semibold text-sm">DressingWala</div>
+                    <div className="text-white/70 text-xs">Online</div>
+                  </div>
+                </div>
+                {/* Chat Area */}
+                <div className="flex-1 bg-[#EAF6FF] p-5 flex flex-col gap-4 overflow-hidden relative">
+                   {/* Chat Background Pattern - abstract geometric */}
+                   <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#08A6A6 2px, transparent 2px)', backgroundSize: '16px 16px' }}></div>
+                   
+                   {/* Message User */}
+                   <div className="self-end bg-white rounded-2xl rounded-tr-none px-4 py-3 shadow-sm max-w-[85%] relative z-10 mt-4">
+                     <p className="text-[13px] text-[#0B1F44]">Hi! I want to book a home dressing service.</p>
+                     <div className="text-[10px] text-right text-gray-400 mt-1">10:00 AM</div>
+                   </div>
+                   
+                   {/* Message DW */}
+                   <div className="self-start bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%] relative z-10 border border-[#E5EEF0]">
+                     <p className="text-[13px] text-[#0B1F44]">Sure! Let's get started. Could you share your location?</p>
+                     <div className="text-[10px] text-right text-gray-400 mt-1">10:01 AM</div>
+                   </div>
+
+                   {/* Message User Location (Mockup) */}
+                   <div className="self-end bg-white rounded-2xl rounded-tr-none p-2 shadow-sm max-w-[85%] relative z-10">
+                     <div className="w-full h-24 bg-[#DDF7F5] rounded-xl flex items-center justify-center mb-2 overflow-hidden relative">
+                        <MapPin className="text-[#08A6A6] w-6 h-6 absolute" />
+                     </div>
+                     <p className="text-[13px] text-[#0B1F44] px-2 pb-1">Current Location</p>
+                   </div>
+                </div>
+                {/* Input Area */}
+                <div className="bg-white p-4 flex items-center gap-3">
+                  <div className="flex-1 bg-gray-50 rounded-full h-10 border border-gray-100 flex items-center px-4">
+                    <span className="text-gray-400 text-sm">Message...</span>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-[#2CC7C2] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4 text-white ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                  </div>
+                </div>
               </div>
-              <f.icon className="w-5 h-5 text-primary" />
-              <div className="mt-2 font-semibold text-sm">{f.title}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{f.desc}</div>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a href={waLink()} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-whatsapp text-white font-semibold shadow-soft hover:scale-[1.02] transition">
-            <MessageCircle className="w-4 h-4" /> Start booking on WhatsApp
-          </a>
+            </div>
+
+            {/* Right: Flow Steps */}
+            <div className="order-1 md:order-2">
+              <span className="inline-block text-xs font-semibold tracking-widest uppercase text-[#08A6A6] mb-3">WHATSAPP BOOKING FLOW</span>
+              <h3 className="text-3xl md:text-4xl font-bold text-[#0B1F44] mb-4">Book without downloads or logins.</h3>
+              <p className="text-[#64748B] mb-10 text-lg">Our hassle-free WhatsApp assistant guides you through booking in under a few minutes.</p>
+
+              <div className="relative">
+                <div className="flex flex-col gap-6">
+                  {chatFlow.map((f, i) => (
+                    <div key={i} className="relative flex items-start gap-5">
+                      {/* Vertical line connecting steps */}
+                      {i < chatFlow.length - 1 && (
+                        <div className="absolute left-[21px] top-14 bottom-[-1.5rem] w-px border-l-2 border-dotted border-gray-300 -z-10"></div>
+                      )}
+                      <div className="flex flex-col items-center gap-1.5 shrink-0 relative z-10 w-11">
+                        <span className="text-[11px] font-bold text-[#64748B] leading-none">0{i+1}</span>
+                        <div 
+                          className="w-11 h-11 rounded-full flex items-center justify-center shadow-sm"
+                          style={{ backgroundColor: f.bg, color: f.color }}
+                        >
+                          <f.icon className="w-5 h-5" />
+                        </div>
+                      </div>
+                      <div className="pt-4 pb-2">
+                        <h4 className="font-bold text-[#0B1F44] leading-tight">{f.title}</h4>
+                        <p className="text-sm text-[#64748B] mt-1">{f.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-12">
+                <a href={waLink()} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-[#25D366] text-white font-bold shadow-[0_8px_20px_rgba(37,211,102,0.25)] hover:shadow-[0_8px_25px_rgba(37,211,102,0.35)] hover:-translate-y-1 transition-all">
+                  Start booking on WhatsApp <span className="text-lg">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
 function Areas() {
   return (
-    <Section id="areas" eyebrow="Coverage" title={"We\u00A0\u00A0\u00A0cover\u00A0\u00A0\u00A0Hyderabad."} subtitle="Professional home wound dressing service across major localities in Hyderabad and Secunderabad. Same-day visits available in Gachibowli, Madhapur, Hitech City, Kondapur, and all major areas. Don't see your area? Message us — we're expanding fast.">
-      <div className="rounded-3xl border bg-card p-6 md:p-8" itemScope itemType="https://schema.org/Service">
-        <div className="flex items-center gap-2 mb-6 text-muted-foreground">
-          <MapPin className="w-4 h-4 text-teal" />
-          <span className="text-sm">Live coverage — Hyderabad & Secunderabad</span>
+    <section id="areas" className="py-20 md:py-32 px-4 md:px-6 scroll-mt-20 bg-[#FBFDFD]">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="inline-block text-sm font-semibold tracking-[0.2em] uppercase text-[#08A6A6] mb-4">COVERAGE</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-[#0B1F44]">We cover Hyderabad.</h2>
+          <p className="mt-6 text-lg text-[#64748B] leading-relaxed">
+            Professional home wound dressing services are available across major Hyderabad and Secunderabad areas.
+          </p>
         </div>
-        <nav aria-label="Service coverage areas in Hyderabad">
-          <ul className="flex flex-wrap gap-2" role="list">
-            {areas.map((a) => (
-              <li key={a} itemProp="areaServed" itemScope itemType="https://schema.org/Place">
-                <span itemProp="name" className="px-4 py-2 rounded-full bg-surface border text-sm font-medium hover:border-primary hover:text-primary transition cursor-default inline-block">
-                  {a}
-                </span>
-              </li>
-            ))}
-            <li>
-              <a href={waLink("Do you cover my area? My locality is …")} target="_blank" rel="noopener noreferrer"
-                className="px-4 py-2 rounded-full bg-gradient-brand text-primary-foreground text-sm font-semibold inline-block"
-                aria-label="Check if your area in Hyderabad is covered">
-                + Check your area
-              </a>
-            </li>
-          </ul>
-        </nav>
+
+        <div className="bg-white rounded-[32px] p-8 md:p-12 shadow-sm border border-[#E5EEF0]">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Locality chips */}
+            <div>
+              <div className="flex flex-wrap gap-3">
+                {areas.map((a) => (
+                  <span key={a} className="px-5 py-3 rounded-full bg-[#F3F0FF] text-[#0B1F44] text-sm font-medium hover:bg-[#DDF7F5] transition-colors cursor-default">
+                    {a}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-10">
+                <a href={waLink("Do you cover my area? My locality is \u2026")} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-bold text-[#08A6A6] hover:text-[#2CC7C2] transition-colors group">
+                  Check your area 
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Right: Abstract Map */}
+            <div className="relative h-[400px] bg-[#EAF6FF] rounded-3xl overflow-hidden flex items-center justify-center p-8">
+              {/* Abstract Map Background */}
+              <div className="absolute inset-0 opacity-20" style={{ 
+                backgroundImage: 'radial-gradient(#08A6A6 1px, transparent 1px)', 
+                backgroundSize: '24px 24px' 
+              }}></div>
+              
+              {/* Abstract Elements to represent map */}
+              <div className="relative w-full max-w-[300px] aspect-square rounded-full border border-dashed border-[#2CC7C2]/40 flex items-center justify-center">
+                 <div className="w-[70%] h-[70%] rounded-full border border-[#2CC7C2]/20 flex items-center justify-center">
+                    <div className="w-[40%] h-[40%] bg-white/50 rounded-full blur-md"></div>
+                 </div>
+                 
+                 {/* Map Pins */}
+                 <div className="absolute top-[20%] left-[10%] flex flex-col items-center animate-float" style={{ animationDelay: '0s' }}>
+                   <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-[#08A6A6]">
+                     <MapPin className="w-4 h-4" />
+                   </div>
+                 </div>
+                 
+                 <div className="absolute top-[40%] right-[10%] flex flex-col items-center animate-float" style={{ animationDelay: '1s' }}>
+                   <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-[#08A6A6]">
+                     <MapPin className="w-4 h-4" />
+                   </div>
+                 </div>
+                 
+                 <div className="absolute bottom-[20%] left-[40%] flex flex-col items-center animate-float" style={{ animationDelay: '2s' }}>
+                   <div className="px-4 py-2 bg-white rounded-xl shadow-lg border border-[#E5EEF0] flex items-center gap-2 z-10">
+                     <div className="w-2 h-2 rounded-full bg-[#08A6A6] animate-pulse"></div>
+                     <span className="font-bold text-sm text-[#0B1F44]">Hyderabad</span>
+                   </div>
+                   <div className="w-1 h-8 bg-gradient-to-b from-white to-transparent"></div>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }
 

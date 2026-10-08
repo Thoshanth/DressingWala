@@ -1,16 +1,26 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [
-    TanStackRouterVite(),
+    tanstackStart({
+      srcDirectory: "src",
+      router: {
+        routesDirectory: "routes",
+        generatedRouteTree: "src/routeTree.gen.ts",
+      },
+    }),
     react(),
     tailwindcss(),
   ],
   resolve: {
-    tsconfigPaths: true,
+    alias: {
+      "@": "/src",
+    },
+  },
+  server: {
+    allowedHosts: ["womanlike-opt-hexagram.ngrok-free.dev"],
   },
 });

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Phone, Calendar, Menu, X, MessageCircle, MapPin } from "lucide-react";
+import { Phone, Calendar, Menu, X, MessageCircle, MapPin, Mail } from "lucide-react";
 import { openBooking } from "@/components/booking-dialog";
 import { CONTACT, waLink, telLink } from "@/lib/contact";
 import logo from "@/assets/Logo.jpg";
 import { Link, useLocation } from "@tanstack/react-router";
+
+import { servicePages } from "@/lib/service-pages";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -118,8 +120,8 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-surface mt-20">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 grid md:grid-cols-4 gap-8">
-        <div className="md:col-span-2">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 grid grid-cols-2 lg:grid-cols-6 gap-8">
+        <div className="col-span-2">
           <div className="flex items-center gap-2">
             <img src={logo} alt="DressingWala" className="h-12 md:h-16 w-auto object-contain mix-blend-multiply dark:mix-blend-screen dark:invert" />
             <span className="font-display font-bold text-lg">DressingWala</span>
@@ -128,20 +130,35 @@ export function Footer() {
             Premium home wound-dressing and post-surgery care in Hyderabad. Verified nurses, sterile technique, transparent pricing.
           </p>
         </div>
-        <div>
-          <h4 className="font-semibold text-sm mb-3">Reach us</h4>
-          <ul className="text-sm space-y-2 text-muted-foreground">
-            <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> <a href={telLink()} className="hover:text-foreground">{CONTACT.phoneDisplay}</a></li>
-            <li className="flex items-center gap-2"><MessageCircle className="w-4 h-4" /> <a href={waLink()} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">WhatsApp us</a></li>
-            <li className="flex items-center gap-2"><MapPin className="w-4 h-4" /> Hyderabad, India</li>
+        
+        <div className="col-span-2">
+          <h4 className="font-semibold text-sm mb-3">Our Services</h4>
+          <ul className="text-sm space-y-2 text-muted-foreground grid sm:grid-cols-2 gap-x-4 gap-y-2">
+            {servicePages.map(page => (
+              <li key={page.slug}>
+                <Link to={page.path} className="hover:text-foreground line-clamp-1" title={page.h1}>{page.h1.replace(" at Home in Hyderabad", "").replace(" at Home After Surgery, Hyderabad", "")}</Link>
+              </li>
+            ))}
           </ul>
         </div>
-        <div>
+
+        <div className="col-span-2 sm:col-span-1">
+          <h4 className="font-semibold text-sm mb-3">Reach us</h4>
+          <ul className="text-sm space-y-2 text-muted-foreground">
+            <li className="flex items-center gap-2"><Phone className="w-4 h-4 shrink-0" /> <a href={telLink()} className="hover:text-foreground">{CONTACT.phoneDisplay}</a></li>
+            <li className="flex items-center gap-2"><MessageCircle className="w-4 h-4 shrink-0" /> <a href={waLink()} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">WhatsApp us</a></li>
+            <li className="flex items-start gap-2"><Mail className="w-4 h-4 shrink-0 mt-0.5" /> <a href={`mailto:${CONTACT.email}`} className="hover:text-foreground break-all">{CONTACT.email}</a></li>
+            <li className="flex items-start gap-2"><MapPin className="w-4 h-4 shrink-0 mt-0.5" /> <span>Hyderabad, India</span></li>
+          </ul>
+        </div>
+        <div className="col-span-2 sm:col-span-1">
           <h4 className="font-semibold text-sm mb-3">Quick links</h4>
           <ul className="text-sm space-y-2 text-muted-foreground">
             <li><a href="/#services" onClick={(e) => handleScroll(e, "services")} className="hover:text-foreground">Services</a></li>
             <li><a href="/#pricing" onClick={(e) => handleScroll(e, "pricing")} className="hover:text-foreground">Pricing</a></li>
             <li><a href="/#areas" onClick={(e) => handleScroll(e, "areas")} className="hover:text-foreground">Areas we serve</a></li>
+            <li><Link to="/about" className="hover:text-foreground">About Us</Link></li>
+            <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
             <li><Link to="/blogs" className="hover:text-foreground">Blogs</Link></li>
           </ul>
         </div>
